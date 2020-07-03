@@ -21,22 +21,27 @@
     <spring-javaformat.plugin.version>0.0.22</spring-javaformat.plugin.version>
     <git.commit.plugin.version>2.2.5</git.commit.plugin.version>
     <spring-boot.version>2.3.1.RELEASE</spring-boot.version>
-    <lombok.version>1.18.10</lombok.version>
     <hutool.version>5.3.1</hutool.version>
-    <junit.version>4.12</junit.version>
   </properties>
 
   <dependencies>
     <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>${lombok.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
