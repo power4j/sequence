@@ -32,6 +32,8 @@ public class LongSeqPool implements SeqPool<Long, LongSeqPool> {
 	 */
 	public final static long OUT_OF_POOL = Long.MAX_VALUE;
 
+	private final String name;
+
 	@Getter
 	private final long start;
 
@@ -45,36 +47,40 @@ public class LongSeqPool implements SeqPool<Long, LongSeqPool> {
 
 	/**
 	 * 根据数量创建
+	 * @param name 名称
 	 * @param start 起始值，包含
 	 * @param size 数量,以步长为单位
 	 * @param reRoll 是否允许滚动
 	 * @return
 	 */
-	public static LongSeqPool forSize(long start, int size, boolean reRoll) {
-		return new LongSeqPool(start, start + size, reRoll);
+	public static LongSeqPool forSize(String name, long start, int size, boolean reRoll) {
+		return new LongSeqPool(name, start, start + size, reRoll);
 	}
 
 	/**
 	 * 根据区间创建
+	 * @param name 名称
 	 * @param min 起始值，包含
 	 * @param max end 结束值，包含，最大值为 {@code Long.MAX_VALUE - 1 }
 	 * @param reRoll 是否允许滚动
 	 * @return
 	 */
-	public static LongSeqPool forRange(long min, long max, boolean reRoll) {
+	public static LongSeqPool forRange(String name, long min, long max, boolean reRoll) {
 		if (max >= MAX_VALUE) {
 			throw new IllegalArgumentException("invalid max value");
 		}
-		return new LongSeqPool(min, max + ONE, reRoll);
+		return new LongSeqPool(name, min, max + ONE, reRoll);
 	}
 
 	/**
 	 * constructor
+	 * @param name 名称
 	 * @param start 起始值，包含
 	 * @param end 结束值，不包含
 	 * @param reRoll 是否允许滚动，可以滚动的号池永远不会耗尽
 	 */
-	private LongSeqPool(long start, long end, boolean reRoll) {
+	private LongSeqPool(String name, long start, long end, boolean reRoll) {
+		this.name = name;
 		this.start = start;
 		this.end = end;
 		this.reRoll = reRoll;
@@ -82,6 +88,11 @@ public class LongSeqPool implements SeqPool<Long, LongSeqPool> {
 		if (end - start < ONE) {
 			throw new IllegalArgumentException("nothing to offer");
 		}
+	}
+
+	@Override
+	public String getName() {
+		return name;
 	}
 
 	@Override
@@ -133,8 +144,8 @@ public class LongSeqPool implements SeqPool<Long, LongSeqPool> {
 	}
 
 	@Override
-	public LongSeqPool fork() {
-		LongSeqPool seqPool = new LongSeqPool(start, end, reRoll);
+	public LongSeqPool fork(String name) {
+		LongSeqPool seqPool = new LongSeqPool(name, start, end, reRoll);
 		seqPool.setCurrent(peek());
 		return seqPool;
 	}

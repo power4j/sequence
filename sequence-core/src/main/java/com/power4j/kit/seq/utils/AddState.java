@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * 二元组
+ * 加法操作执行结果
  *
  * @author CJ (jclazz@outlook.com)
  * @date 2020/7/2
@@ -12,16 +12,34 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
-public class Pair<L,R> {
-    private L left;
-    private R right;
-    private static final Pair<?,?> NULL_VAL = new Pair<>(null,null);
+public class AddState {
 
-    public static <L,R> Pair<L,R> of(L left,R right){
-        return new Pair<>(left,right);
-    }
+	/**
+	 *
+	 */
+	private boolean success;
 
-    public static <L,R> Pair<L,R> nothing(){
-        return (Pair<L,R>)NULL_VAL;
-    }
+	/**
+	 * 前一个值
+	 */
+	private Long previous;
+
+	/**
+	 * 当前值
+	 */
+	private Long current;
+
+	/**
+	 * 操作次数
+	 */
+	private int totalOps;
+
+	public static AddState fail(int totalOps) {
+		return new AddState(false, null, null, totalOps);
+	}
+
+	public static AddState success(long previous, long current, int totalOps) {
+		return new AddState(true, previous, current, totalOps);
+	}
+
 }

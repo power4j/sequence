@@ -10,11 +10,13 @@ import static org.junit.Assert.*;
 
 public class LongSeqPoolTest {
 
+	private final String poolName = "test-seq-pool";
+
 	@Test
 	public void simpleTest() {
 		final long start = -100L;
 		final int size = 200;
-		LongSeqPool pool = LongSeqPool.forSize(start, size, false);
+		LongSeqPool pool = LongSeqPool.forSize(poolName, start, size, false);
 
 		assertEquals(pool.capacity(), size);
 		assertEquals(pool.remaining(), size);
@@ -35,7 +37,7 @@ public class LongSeqPoolTest {
 	public void rollingTest() {
 		final long start = -10L;
 		final int size = 20;
-		LongSeqPool pool = LongSeqPool.forSize(start, size, true);
+		LongSeqPool pool = LongSeqPool.forSize(poolName, start, size, true);
 
 		for (int round = 0; round < 3; ++round) {
 			for (int i = 0; i < size; ++i) {
@@ -52,7 +54,7 @@ public class LongSeqPoolTest {
 
 	@Test
 	public void forRangeTest() {
-		LongSeqPool pool = LongSeqPool.forRange(1, 2, false);
+		LongSeqPool pool = LongSeqPool.forRange(poolName, 1, 2, false);
 		assertEquals(pool.capacity(), 2);
 
 		Optional<Long> val = pool.nextOpt();
@@ -69,10 +71,10 @@ public class LongSeqPoolTest {
 	public void forkTest() {
 		final long start = -10L;
 		final int size = 20;
-		LongSeqPool pool = LongSeqPool.forSize(start, size, false);
+		LongSeqPool pool = LongSeqPool.forSize(poolName, start, size, false);
 
 		for (int i = 0; i < size; ++i) {
-			LongSeqPool fork = pool.fork();
+			LongSeqPool fork = pool.fork(poolName);
 			assertEquals(pool.peek(), fork.peek());
 			long val1 = pool.take();
 			long val2 = fork.take();
@@ -87,7 +89,7 @@ public class LongSeqPoolTest {
 		final int threads = Runtime.getRuntime().availableProcessors() * 2 + 1;
 		final long start = -100L;
 		final int size = 2000;
-		LongSeqPool pool = LongSeqPool.forSize(start, size, true);
+		LongSeqPool pool = LongSeqPool.forSize(poolName, start, size, true);
 		Map<String, List<Long>> threadResults = new ConcurrentHashMap<>(threads);
 		final CountDownLatch startRun = new CountDownLatch(threads);
 		final CountDownLatch completed = new CountDownLatch(threads);

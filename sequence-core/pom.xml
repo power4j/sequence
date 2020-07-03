@@ -12,12 +12,16 @@
 
   <artifactId>sequence-core</artifactId>
 
-
   <properties>
     <skipTests>false</skipTests>
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>com.zaxxer</groupId>
+      <artifactId>HikariCP</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>

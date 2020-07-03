@@ -1,22 +1,17 @@
-package com.power4j.kit.seq.persistent.provider;
+package com.power4j.kit.seq.core;
 
+import com.power4j.kit.seq.persistent.provider.MySqlSynchronizer;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.sql.DataSource;
+import java.time.LocalDateTime;
 
-/**
- * Mysql 测试
- * <p>
- *
- * @author CJ (jclazz@outlook.com)
- * @date 2020/7/3
- * @since 1.0
- */
-public class MySqlSynchronizerTest {
+public class SeqHolderTest {
 
 	private final static String SEQ_TABLE = "tb_seq";
 
@@ -48,17 +43,19 @@ public class MySqlSynchronizerTest {
 
 	@Test
 	public void simpleTest() {
-		SynchronizerTestCase.simpleTest(mySqlSynchronizer);
-	}
+		final String seqName = "power4j";
+		final long initValue = 1000L;
+		final int size = 10;
+		SeqHolder holder = new SeqHolder(mySqlSynchronizer, seqName, () -> LocalDateTime.now().toString(), initValue,
+				size);
+		for (int loop = 0; loop < 10; ++loop) {
+			for (int i = 0; i < size; ++i) {
+				System.out.println(holder.nextFormatted().get());
+			}
 
-	@Test
-	public void multipleThreadUpdateTest() {
-		SynchronizerTestCase.multipleThreadUpdateTest(mySqlSynchronizer);
-	}
-
-	@Test
-	public void multipleThreadAddTest() {
-		SynchronizerTestCase.multipleThreadAddTest(mySqlSynchronizer);
+			System.out.println(String.format("pull count = %d", holder.getPullCount()));
+			Assert.assertTrue(holder.getPullCount() == loop + 1);
+		}
 	}
 
 }
