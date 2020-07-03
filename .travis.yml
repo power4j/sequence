@@ -1,0 +1,37 @@
+# Travis CI Java documentation can be found in:
+# https://docs.travis-ci.com/user/languages/java/
+
+# We will use Ubuntu 18.04 (bionic beaver). List of options:
+# https://docs.travis-ci.com/user/reference/overview/#linux
+dist: xenial
+
+# This enables the 'defaults' to test java applications:
+language: java
+
+# We can specify a list of JDKs to be used for testing
+# A list of available JDKs in Trusty can be seed in:
+# https://docs.travis-ci.com/user/reference/xenial/#jvm-clojure-groovy-java-scala-support
+jdk:
+ - openjdk8
+ - openjdk11
+
+cache:
+  directories:
+    - $HOME/.m2
+
+# https://docs.travis-ci.com/user/job-lifecycle/
+script:
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V -P '!aliyun-repo'
+  - mvn test -B -P '!aliyun-repo'
+
+# This is to enable CodeCov's coverage
+# If a build is successful, the code is submitted for coverage analysis
+# export CODECOV_TOKEN="xxx"
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
+before_install:
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
+
+services:
+  - mysql

@@ -1,6 +1,7 @@
-package com.power4j.kit.seq.core;
+package com.power4j.kit.seq.persistent;
 
-import com.power4j.kit.seq.persistent.SeqSynchronizer;
+import com.power4j.kit.seq.core.LongSeqPool;
+import com.power4j.kit.seq.core.SeqFormatter;
 import com.power4j.kit.seq.utils.AddState;
 
 import java.util.Optional;
