@@ -15,10 +15,11 @@ public class TestDataSources {
 	public final static String MYSQL_JDBC_URL = "jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false";
 
 	public static DataSource getMySqlDataSource() {
+		String pwd = System.getenv("MYSQL_TEST_PWD");
 		HikariConfig config = new HikariConfig();
 		config.setJdbcUrl(MYSQL_JDBC_URL);
 		config.setUsername("root");
-		config.setPassword("");
+		config.setPassword(pwd == null ? "" : pwd.trim());
 		config.addDataSourceProperty("cachePrepStmts", "true");
 		config.addDataSourceProperty("prepStmtCacheSize", "100");
 		config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");

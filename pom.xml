@@ -7,10 +7,16 @@
   <version>1.0.1-SNAPSHOT</version>
   <name>${project.artifactId}</name>
   <packaging>pom</packaging>
+
   <organization>
     <name>power4j</name>
     <url>https://github.com/power4j</url>
   </organization>
+
+  <scm>
+    <url>https://github.com/ribasco/async-gamequery-lib</url>
+    <connection>scm:git:git://github.com/power4j/sequence.git</connection>
+  </scm>
 
   <properties>
     <skipTests>true</skipTests>
@@ -35,11 +41,6 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
@@ -48,6 +49,7 @@
 
   <modules>
     <module>sequence-core</module>
+    <module>bench-test</module>
   </modules>
 
   <dependencyManagement>

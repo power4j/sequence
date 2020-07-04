@@ -1,8 +1,8 @@
 package com.power4j.kit.seq.persistent.provider;
 
+import com.power4j.kit.seq.persistent.SeqSynchronizer;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 
 /**
  * Mysql 测试
@@ -12,7 +12,7 @@ import org.junit.Test;
  * @date 2020/7/3
  * @since 1.0
  */
-public class MySqlSynchronizerTest {
+public class MySqlSynchronizerTest extends SynchronizerTestCase {
 
 	public final static String SEQ_TABLE = "tb_seq";
 
@@ -29,19 +29,9 @@ public class MySqlSynchronizerTest {
 		mySqlSynchronizer.dropTable();
 	}
 
-	@Test
-	public void simpleTest() {
-		SynchronizerTestCase.simpleTest(mySqlSynchronizer);
-	}
-
-	@Test
-	public void multipleThreadUpdateTest() {
-		SynchronizerTestCase.multipleThreadUpdateTest(mySqlSynchronizer);
-	}
-
-	@Test
-	public void multipleThreadAddTest() {
-		SynchronizerTestCase.multipleThreadAddTest(mySqlSynchronizer);
+	@Override
+	protected SeqSynchronizer getSeqSynchronizer() {
+		return mySqlSynchronizer;
 	}
 
 }

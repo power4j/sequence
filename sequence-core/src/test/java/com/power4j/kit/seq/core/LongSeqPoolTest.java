@@ -13,8 +13,42 @@ public class LongSeqPoolTest {
 	private final String poolName = "test-seq-pool";
 
 	@Test
+	public void minValueTest() {
+		long start = LongSeqPool.MIN_VALUE;
+		int size = 2;
+		LongSeqPool pool = LongSeqPool.forSize(poolName, start, size, false);
+		assertEquals(pool.capacity(), size);
+		assertEquals(pool.remaining(), size);
+		assertEquals(pool.peek().longValue(), start);
+		for (int i = 0; i < size; ++i) {
+			long val = pool.next();
+			assertEquals(pool.capacity(), size);
+			assertEquals(pool.remaining(), size - (i + 1));
+			assertEquals(val, start + i);
+		}
+		assertEquals(pool.remaining(), 0);
+	}
+
+	@Test
+	public void maxValueTest() {
+		long start = LongSeqPool.MAX_VALUE;
+		int size = 1;
+		LongSeqPool pool = LongSeqPool.forSize(poolName, start, size, false);
+		assertEquals(pool.capacity(), size);
+		assertEquals(pool.remaining(), size);
+		assertEquals(pool.peek().longValue(), start);
+		for (int i = 0; i < size; ++i) {
+			long val = pool.next();
+			assertEquals(pool.capacity(), size);
+			assertEquals(pool.remaining(), size - (i + 1));
+			assertEquals(val, start + i);
+		}
+		assertEquals(pool.remaining(), 0);
+	}
+
+	@Test
 	public void simpleTest() {
-		final long start = -100L;
+		final long start = 0L;
 		final int size = 200;
 		LongSeqPool pool = LongSeqPool.forSize(poolName, start, size, false);
 
@@ -35,7 +69,7 @@ public class LongSeqPoolTest {
 
 	@Test
 	public void rollingTest() {
-		final long start = -10L;
+		final long start = 0L;
 		final int size = 20;
 		LongSeqPool pool = LongSeqPool.forSize(poolName, start, size, true);
 
@@ -69,7 +103,7 @@ public class LongSeqPoolTest {
 
 	@Test
 	public void forkTest() {
-		final long start = -10L;
+		final long start = 10L;
 		final int size = 20;
 		LongSeqPool pool = LongSeqPool.forSize(poolName, start, size, false);
 
@@ -87,7 +121,7 @@ public class LongSeqPoolTest {
 	public void threadSafeTest() {
 
 		final int threads = Runtime.getRuntime().availableProcessors() * 2 + 1;
-		final long start = -100L;
+		final long start = 0L;
 		final int size = 2000;
 		LongSeqPool pool = LongSeqPool.forSize(poolName, start, size, true);
 		Map<String, List<Long>> threadResults = new ConcurrentHashMap<>(threads);

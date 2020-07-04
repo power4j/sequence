@@ -9,9 +9,8 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * 序号池(Long型)
  * <ul>
- * <li>取值范围{@code [Long.MIN_VALUE,Long.MAX_VALUE - 1]}</li>
+ * <li>取值范围{@code [0,Long.MAX_VALUE]}</li>
  * <li>支持一次性取号和循环取号</li>
- * <li>序号可以是负数</li>
  * <li>线程安全,lock free</li>
  * </ul>
  *
@@ -25,12 +24,14 @@ public class LongSeqPool implements SeqPool<Long, LongSeqPool> {
 
 	private final static long ONE = 1L;
 
-	public final static long MAX_VALUE = Long.MAX_VALUE - ONE;
+	public final static long MAX_VALUE = Long.MAX_VALUE;
+
+	public final static long MIN_VALUE = ZERO;
 
 	/**
 	 * 表示一个号池外的值
 	 */
-	public final static long OUT_OF_POOL = Long.MAX_VALUE;
+	public final static long OUT_OF_POOL = Long.MIN_VALUE;
 
 	private final String name;
 
@@ -49,44 +50,43 @@ public class LongSeqPool implements SeqPool<Long, LongSeqPool> {
 	 * 根据数量创建
 	 * @param name 名称
 	 * @param start 起始值，包含
-	 * @param size 数量,以步长为单位
+	 * @param size 数量
 	 * @param reRoll 是否允许滚动
 	 * @return
 	 */
 	public static LongSeqPool forSize(String name, long start, int size, boolean reRoll) {
-		return new LongSeqPool(name, start, start + size, reRoll);
+		return new LongSeqPool(name, start, start + size - ONE, reRoll);
 	}
 
 	/**
 	 * 根据区间创建
 	 * @param name 名称
 	 * @param min 起始值，包含
-	 * @param max end 结束值，包含，最大值为 {@code Long.MAX_VALUE - 1 }
+	 * @param max end 结束值，包含
 	 * @param reRoll 是否允许滚动
 	 * @return
 	 */
 	public static LongSeqPool forRange(String name, long min, long max, boolean reRoll) {
-		if (max >= MAX_VALUE) {
-			throw new IllegalArgumentException("invalid max value");
-		}
-		return new LongSeqPool(name, min, max + ONE, reRoll);
+		return new LongSeqPool(name, min, max, reRoll);
 	}
 
 	/**
 	 * constructor
 	 * @param name 名称
 	 * @param start 起始值，包含
-	 * @param end 结束值，不包含
+	 * @param end 结束值，包含
 	 * @param reRoll 是否允许滚动，可以滚动的号池永远不会耗尽
 	 */
 	private LongSeqPool(String name, long start, long end, boolean reRoll) {
+		assertMinValue(start, "Invalid start value: " + start);
+		assertMaxValue(end, "Invalid end value: " + end);
 		this.name = name;
 		this.start = start;
 		this.end = end;
 		this.reRoll = reRoll;
 		this.current = new AtomicLong(start);
-		if (end - start < ONE) {
-			throw new IllegalArgumentException("nothing to offer");
+		if (end < start) {
+			throw new IllegalArgumentException("Nothing to offer");
 		}
 	}
 
@@ -102,7 +102,8 @@ public class LongSeqPool implements SeqPool<Long, LongSeqPool> {
 
 	@Override
 	public Optional<Long> nextOpt() {
-		return Optional.ofNullable(hasMore() ? take() : null);
+		final long val = take(OUT_OF_POOL);
+		return Optional.ofNullable(OUT_OF_POOL == val ? null : val);
 	}
 
 	@Override
@@ -118,8 +119,9 @@ public class LongSeqPool implements SeqPool<Long, LongSeqPool> {
 	 */
 	public long take() {
 		final long val = take(OUT_OF_POOL);
-		if (!reRoll && val == OUT_OF_POOL) {
-			throw new SeqException("no more value");
+		if (val == OUT_OF_POOL) {
+			long current = peek();
+			throw new SeqException(String.format("No more value,current = %08d(%d/%d)", current, start, end));
 		}
 		return val;
 	}
@@ -132,10 +134,18 @@ public class LongSeqPool implements SeqPool<Long, LongSeqPool> {
 	 * @see LongSeqPool#OUT_OF_POOL
 	 */
 	public long take(long defVal) {
-		if (defVal >= start && defVal < end) {
-			throw new IllegalArgumentException("bad defVal");
+		if (defVal >= start && defVal <= end) {
+			throw new IllegalArgumentException("Bad defVal");
 		}
-		return current.getAndUpdate(n -> updateFunc(n, defVal));
+		long val = current.getAndUpdate(n -> updateFunc(n));
+		return (val > end || val < start) ? defVal : val;
+	}
+
+	private long updateFunc(final long pre) {
+		if (reRoll && pre >= end) {
+			return minValue();
+		}
+		return pre + ONE;
 	}
 
 	@Override
@@ -152,18 +162,12 @@ public class LongSeqPool implements SeqPool<Long, LongSeqPool> {
 
 	@Override
 	public long remaining() {
-		if (reRoll) {
-			return capacity();
-		}
-		else {
-			final long val = peek();
-			return val > end ? ZERO : end - val;
-		}
+		return reRoll ? capacity() : end - peek() + ONE;
 	}
 
 	@Override
 	public long capacity() {
-		return end - start;
+		return end - start + ONE;
 	}
 
 	@Override
@@ -173,14 +177,7 @@ public class LongSeqPool implements SeqPool<Long, LongSeqPool> {
 
 	@Override
 	public Long maxValue() {
-		return end - ONE;
-	}
-
-	private long updateFunc(final long pre, long defVal) {
-		if (pre >= maxValue()) {
-			return reRoll ? minValue() : defVal;
-		}
-		return pre + ONE;
+		return end;
 	}
 
 	private void setCurrent(long val) {
@@ -189,7 +186,19 @@ public class LongSeqPool implements SeqPool<Long, LongSeqPool> {
 
 	@Override
 	public String toString() {
-		return peek() + " -> [" + start + "," + end + "),reRoll = " + reRoll;
+		return peek() + " -> [" + start + "," + end + "],reRoll = " + reRoll;
+	}
+
+	protected void assertMinValue(long val, String msg) {
+		if (val < MIN_VALUE) {
+			throw new SeqException(msg);
+		}
+	}
+
+	protected void assertMaxValue(long val, String msg) {
+		if (val > MAX_VALUE) {
+			throw new SeqException(msg);
+		}
 	}
 
 }

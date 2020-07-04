@@ -34,16 +34,6 @@ public interface SeqPool<T, S extends SeqPool<T, S>> {
 	Optional<T> nextOpt();
 
 	/**
-	 * 取值并转换
-	 * @param converter
-	 * @return
-	 * @throws SeqException 号池耗尽抛出异常
-	 */
-	default <R> R next(Function<T, R> converter) throws SeqException {
-		return converter.apply(next());
-	}
-
-	/**
 	 * 查看当前计数器的值,注意此方法不能保证取值的有效性
 	 * @return
 	 */
@@ -85,5 +75,15 @@ public interface SeqPool<T, S extends SeqPool<T, S>> {
 	 * @return
 	 */
 	T maxValue();
+
+	/**
+	 * 取值并转换
+	 * @param converter
+	 * @return
+	 * @throws SeqException 号池耗尽抛出异常
+	 */
+	default <R> R next(Function<T, R> converter) throws SeqException {
+		return converter.apply(next());
+	}
 
 }

@@ -52,9 +52,9 @@ public class MySqlSynchronizer implements SeqSynchronizer {
 
 	public void createTable() {
 		log.info("create table if not exists : {}", tableName);
-		try (Connection connection = getConnection();
-				PreparedStatement statement = connection
-						.prepareStatement(MYSQL_CREATE_TABLE.replace("$TABLE_NAME", tableName))) {
+		final String sql = MYSQL_CREATE_TABLE.replace("$TABLE_NAME", tableName);
+		log.debug(sql);
+		try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.executeUpdate();
 		}
 		catch (SQLException e) {
@@ -65,9 +65,9 @@ public class MySqlSynchronizer implements SeqSynchronizer {
 
 	public void dropTable() {
 		log.warn("drop table if exists : {}", tableName);
-		try (Connection connection = getConnection();
-				PreparedStatement statement = connection
-						.prepareStatement(MYSQL_DROP_TABLE.replace("$TABLE_NAME", tableName))) {
+		final String sql = MYSQL_DROP_TABLE.replace("$TABLE_NAME", tableName);
+		log.debug(sql);
+		try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.executeUpdate();
 		}
 		catch (SQLException e) {
@@ -130,10 +130,12 @@ public class MySqlSynchronizer implements SeqSynchronizer {
 	}
 
 	protected Optional<Long> selectInternal(Connection connection, String name, String partition) throws SQLException {
-		try (PreparedStatement statement = connection
-				.prepareStatement(MYSQL_SELECT_VALUE.replace("$TABLE_NAME", tableName))) {
+		final String sql = MYSQL_SELECT_VALUE.replace("$TABLE_NAME", tableName);
+		log.debug(sql);
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setString(1, name);
 			statement.setString(2, partition);
+			log.debug(String.format("param: [%s] [%s]", name, partition));
 			try (ResultSet resultSet = statement.executeQuery();) {
 				if (resultSet.next()) {
 					if (resultSet.getObject(1) == null) {
@@ -146,31 +148,40 @@ public class MySqlSynchronizer implements SeqSynchronizer {
 		}
 	}
 
-	protected boolean createIgnoreInternal(Connection connection, String name, String slice, long nextValue)
+	protected boolean createIgnoreInternal(Connection connection, String name, String partition, long nextValue)
 			throws SQLException {
 		final Timestamp now = Timestamp.valueOf(LocalDateTime.now());
-		try (PreparedStatement statement = connection
-				.prepareStatement(MYSQL_INSERT_IGNORE.replace("$TABLE_NAME", tableName))) {
+		final String sql = MYSQL_INSERT_IGNORE.replace("$TABLE_NAME", tableName);
+		log.debug(sql);
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setString(1, name);
-			statement.setString(2, slice);
+			statement.setString(2, partition);
 			statement.setLong(3, nextValue);
 			statement.setTimestamp(4, now);
 			statement.setTimestamp(5, null);
-			return statement.executeUpdate() > 0;
+			log.debug(String.format("param: [%s] [%s] [%d] [%s] [%s]", name, partition, nextValue, now, null));
+			int rows = statement.executeUpdate();
+			log.debug(String.format("update rows: %d", rows));
+			return rows > 0;
 		}
 	}
 
-	protected boolean updateInternal(Connection connection, String name, String slice, long nextValueOld,
+	protected boolean updateInternal(Connection connection, String name, String partition, long nextValueOld,
 			long nextValueNew) throws SQLException {
 		final Timestamp now = Timestamp.valueOf(LocalDateTime.now());
-		try (PreparedStatement statement = connection
-				.prepareStatement(MYSQL_UPDATE_VALUE.replace("$TABLE_NAME", tableName))) {
+		final String sql = MYSQL_UPDATE_VALUE.replace("$TABLE_NAME", tableName);
+		log.debug(sql);
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setLong(1, nextValueNew);
 			statement.setTimestamp(2, now);
 			statement.setString(3, name);
-			statement.setString(4, slice);
+			statement.setString(4, partition);
 			statement.setLong(5, nextValueOld);
-			return statement.executeUpdate() > 0;
+			log.debug(String.format("param: [%d] [%s] [%s] [%s] [%d]", nextValueNew, now.toString(), name, partition,
+					nextValueOld));
+			int rows = statement.executeUpdate();
+			log.debug(String.format("update rows: %d", rows));
+			return rows > 0;
 		}
 	}
 
@@ -181,18 +192,6 @@ public class MySqlSynchronizer implements SeqSynchronizer {
 		catch (Exception e) {
 			log.warn(e.getMessage(), e);
 			throw new SeqException(e.getMessage(), e);
-		}
-	}
-
-	public static void closeQuietly(AutoCloseable autoCloseable) {
-		if (autoCloseable == null) {
-			return;
-		}
-		try {
-			autoCloseable.close();
-		}
-		catch (Exception e) {
-			// Ignore
 		}
 	}
 

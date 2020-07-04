@@ -3,6 +3,7 @@ package com.power4j.kit.seq.persistent.provider;
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
 import com.power4j.kit.seq.utils.AddState;
 import org.junit.Assert;
+import org.junit.Test;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -18,13 +19,16 @@ import java.util.concurrent.atomic.AtomicLong;
  * @date 2020/7/3
  * @since 1.0
  */
-public class SynchronizerTestCase {
+public abstract class SynchronizerTestCase {
+
+	protected abstract SeqSynchronizer getSeqSynchronizer();
 
 	/**
 	 * 一般使用步骤测试
-	 * @param seqSynchronizer
 	 */
-	public static void simpleTest(SeqSynchronizer seqSynchronizer) {
+	@Test
+	public void simpleTest() {
+		final SeqSynchronizer seqSynchronizer = getSeqSynchronizer();
 		final String seqName = "power4j";
 		final String partition = LocalDateTime.now().toString();
 		final long initValue = 1000L;
@@ -49,9 +53,10 @@ public class SynchronizerTestCase {
 
 	/**
 	 * 测试多线程更新操作
-	 * @param seqSynchronizer
 	 */
-	public static void multipleThreadUpdateTest(SeqSynchronizer seqSynchronizer) {
+	@Test
+	public void multipleThreadUpdateTest() {
+		final SeqSynchronizer seqSynchronizer = getSeqSynchronizer();
 		final String seqName = "power4j";
 		final String partition = LocalDateTime.now().toString();
 		final long initValue = 1L;
@@ -100,9 +105,10 @@ public class SynchronizerTestCase {
 
 	/**
 	 * 测试多线程加法操作
-	 * @param seqSynchronizer
 	 */
-	public static void multipleThreadAddTest(SeqSynchronizer seqSynchronizer) {
+	@Test
+	public void multipleThreadAddTest() {
+		final SeqSynchronizer seqSynchronizer = getSeqSynchronizer();
 		final String seqName = "power4j";
 		final String partition = LocalDateTime.now().toString();
 		final long initValue = 1L;

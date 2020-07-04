@@ -7,16 +7,24 @@ import com.power4j.kit.seq.utils.AddState;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 
 /**
- * 序号领用器,负责从外部领用序号,缓存到本地。
+ * 取号器
  *
  * @author CJ (jclazz@outlook.com)
  * @date 2020/7/3
  * @since 1.0
  */
 public class SeqHolder {
+
+	private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
+
+	private final Lock rLock = rwLock.readLock();
+
+	private final Lock wLock = rwLock.writeLock();
 
 	private final SeqSynchronizer seqSynchronizer;
 
@@ -32,9 +40,9 @@ public class SeqHolder {
 
 	private final AtomicLong pollCount = new AtomicLong();
 
-	private final AtomicReference<LongSeqPool> poolRef = new AtomicReference<>();
-
 	private final AtomicReference<String> currentPartitionRef = new AtomicReference<>();
+
+	private volatile LongSeqPool seqPool;
 
 	/**
 	 * 构造方法
@@ -43,7 +51,7 @@ public class SeqHolder {
 	 * @param partitionFunc 窗口函数
 	 * @param initValue 初始值,号池不存在时使用
 	 * @param poolSize 表示单次申请序号数量
-	 * @param seqFormatter 自定义格式化输出
+	 * @param seqFormatter 自定义格式化输出，可选
 	 */
 	public SeqHolder(SeqSynchronizer seqSynchronizer, String name, Supplier<String> partitionFunc, long initValue,
 			int poolSize, SeqFormatter seqFormatter) {
@@ -52,20 +60,22 @@ public class SeqHolder {
 		this.partitionFunc = partitionFunc;
 		this.initValue = initValue;
 		this.poolSize = poolSize;
-		this.seqFormatter = seqFormatter;
+		this.seqFormatter = seqFormatter == null ? SeqFormatter.DEFAULT : seqFormatter;
+		seqPool = fetch();
 	}
 
 	/**
 	 * 构造方法
 	 * @param seqSynchronizer 同步器
 	 * @param name 名称
-	 * @param partitionFunc 窗口函数
+	 * @param partition 分区名称
 	 * @param initValue 初始值,号池不存在时使用
 	 * @param poolSize 表示单次申请序号数量
+	 * @param seqFormatter 自定义格式化输出，可选
 	 */
-	public SeqHolder(SeqSynchronizer seqSynchronizer, String name, Supplier<String> partitionFunc, long initValue,
-			int poolSize) {
-		this(seqSynchronizer, name, partitionFunc, initValue, poolSize, SeqFormatter.DEFAULT);
+	public SeqHolder(SeqSynchronizer seqSynchronizer, String name, String partition, long initValue, int poolSize,
+			SeqFormatter seqFormatter) {
+		this(seqSynchronizer, name, () -> partition, initValue, poolSize, seqFormatter);
 	}
 
 	/**
@@ -73,13 +83,36 @@ public class SeqHolder {
 	 * @return
 	 */
 	public Optional<Long> next() {
-		return poolRef.updateAndGet(o -> {
-			if (o == null || !o.hasMore()) {
-				pollCount.incrementAndGet();
-				return pull();
+		Optional<Long> val;
+		rLock.lock();
+		try {
+			val = seqPool == null ? Optional.empty() : seqPool.nextOpt();
+			if (val.isPresent()) {
+				return val;
 			}
-			return o;
-		}).nextOpt();
+		}
+		finally {
+			rLock.unlock();
+		}
+		return pull();
+	}
+
+	private final Optional<Long> pull() {
+		Optional<Long> val;
+		wLock.lock();
+		try {
+			val = (seqPool == null ? fetch() : seqPool).nextOpt();
+			if (!val.isPresent()) {
+				val = (seqPool = fetch()).nextOpt();
+				if (!val.isPresent()) {
+					throw new IllegalStateException("Bug detected : " + seqPool.toString());
+				}
+			}
+			return val;
+		}
+		finally {
+			wLock.unlock();
+		}
 	}
 
 	/**
@@ -87,11 +120,15 @@ public class SeqHolder {
 	 * @return
 	 */
 	public Optional<String> nextFormatted() {
-		SeqFormatter formatter = seqFormatter == null ? SeqFormatter.DEFAULT : seqFormatter;
-		return next().map(n -> formatter.format(name, currentPartitionRef.get(), n));
+		return next().map(n -> seqFormatter.format(name, currentPartitionRef.get(), n));
 	}
 
-	private LongSeqPool pull() {
+	private boolean noMore(LongSeqPool seqPool) {
+		return seqPool == null || !seqPool.hasMore();
+	}
+
+	private LongSeqPool fetch() {
+		pollCount.incrementAndGet();
 		String partition = partitionFunc.get();
 		if (seqSynchronizer.tryCreate(name, partition, initValue + poolSize)) {
 			currentPartitionRef.set(partition);

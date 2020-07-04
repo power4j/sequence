@@ -1,5 +1,6 @@
 package com.power4j.kit.seq.persistent;
 
+import com.power4j.kit.seq.core.LongSeqPool;
 import com.power4j.kit.seq.persistent.provider.MySqlSynchronizer;
 import com.power4j.kit.seq.persistent.provider.TestDataSources;
 import org.junit.After;
@@ -8,6 +9,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class SeqHolderTest {
 
@@ -29,17 +35,59 @@ public class SeqHolderTest {
 	@Test
 	public void simpleTest() {
 		final String seqName = "power4j";
-		final long initValue = 1000L;
+		final long initValue = LongSeqPool.MIN_VALUE;
 		final int size = 10;
 		SeqHolder holder = new SeqHolder(mySqlSynchronizer, seqName, () -> LocalDateTime.now().toString(), initValue,
-				size);
+				size, null);
 		for (int loop = 0; loop < 10; ++loop) {
 			for (int i = 0; i < size; ++i) {
 				System.out.println(holder.nextFormatted().get());
 			}
-
 			System.out.println(String.format("pull count = %d", holder.getPullCount()));
 			Assert.assertTrue(holder.getPullCount() == loop + 1);
+		}
+	}
+
+	@Test
+	public void threadTest() {
+		final String seqName = "power4j";
+		final long initValue = LongSeqPool.MIN_VALUE;
+		final int size = 1000;
+		final int threads = 8;
+		CountDownLatch threadReady = new CountDownLatch(threads);
+		CountDownLatch threadDone = new CountDownLatch(threads);
+		ExecutorService executorService = Executors.newFixedThreadPool(threads);
+		AtomicLong got = new AtomicLong();
+
+		SeqHolder holder = new SeqHolder(mySqlSynchronizer, seqName, () -> LocalDateTime.now().toString(), initValue,
+				size, null);
+		for (int t = 0; t < threads; ++t) {
+			CompletableFuture.runAsync(() -> {
+				threadReady.countDown();
+				wait(threadReady);
+				for (int i = 0; i < size; ++i) {
+					long val = holder.next().get();
+					got.incrementAndGet();
+					Assert.assertTrue(val >= initValue);
+				}
+				threadDone.countDown();
+			}, executorService).exceptionally(e -> {
+				threadDone.countDown();
+				e.printStackTrace();
+				return null;
+			});
+		}
+		wait(threadDone);
+		System.out.println(String.format("pull count = %d , except = %d", got.get(), size * threads));
+		Assert.assertTrue(got.get() == size * threads);
+	}
+
+	public static void wait(CountDownLatch countDownLatch) {
+		try {
+			countDownLatch.await();
+		}
+		catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
 		}
 	}
 
