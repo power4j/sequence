@@ -69,6 +69,7 @@ node_modules
 rebel.xml
 *.xml.versionsBackup
 .metadata/
+settings-ossrh.xml
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/

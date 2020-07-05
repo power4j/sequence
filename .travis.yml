@@ -21,8 +21,8 @@ cache:
 
 # https://docs.travis-ci.com/user/job-lifecycle/
 script:
-  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V -P '!aliyun-repo'
-  - mvn test -B -P '!aliyun-repo'
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V -P '!aliyun-repo,travis-ci'
+  - mvn test -B -P '!aliyun-repo,travis-ci'
 
 # This is to enable CodeCov's coverage
 # If a build is successful, the code is submitted for coverage analysis
