@@ -27,7 +27,8 @@
   <artifactId>bench-test</artifactId>
 
   <properties>
-    <jmh.version>1.14.1</jmh.version>
+    <maven.deploy.skip>true</maven.deploy.skip>
+    <jmh.version>1.23</jmh.version>
   </properties>
 
   <dependencies>

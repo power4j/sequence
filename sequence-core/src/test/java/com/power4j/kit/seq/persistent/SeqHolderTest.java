@@ -40,7 +40,7 @@ public class SeqHolderTest {
 	@Before
 	public void prepare() {
 		mySqlSynchronizer = new MySqlSynchronizer(SEQ_TABLE, TestDataSources.getMySqlDataSource());
-		mySqlSynchronizer.createTable();
+		mySqlSynchronizer.createMissingTable();
 	}
 
 	@After
@@ -77,6 +77,7 @@ public class SeqHolderTest {
 
 		SeqHolder holder = new SeqHolder(mySqlSynchronizer, seqName, () -> LocalDateTime.now().toString(), initValue,
 				size, null);
+        holder.prepare();
 		for (int t = 0; t < threads; ++t) {
 			CompletableFuture.runAsync(() -> {
 				threadReady.countDown();
@@ -95,6 +96,11 @@ public class SeqHolderTest {
 		}
 		wait(threadDone);
 		System.out.println(String.format("pull count = %d , except = %d", got.get(), size * threads));
+
+        System.out.println(String.format("synchronizer query count = %d , update count = %d",
+                mySqlSynchronizer.getQueryCount(),
+                mySqlSynchronizer.getUpdateCount()));
+
 		Assert.assertTrue(got.get() == size * threads);
 	}
 

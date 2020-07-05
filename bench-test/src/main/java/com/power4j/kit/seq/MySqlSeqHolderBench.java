@@ -17,6 +17,7 @@
 package com.power4j.kit.seq;
 
 import com.power4j.kit.seq.persistent.SeqHolder;
+import com.power4j.kit.seq.persistent.SeqSynchronizer;
 import com.power4j.kit.seq.persistent.provider.MySqlSynchronizer;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -45,7 +46,8 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.SECONDS)
 public class MySqlSeqHolderBench {
 
-	private SeqHolder seqHolder;
+    private static SeqSynchronizer synchronizer;
+	private static SeqHolder seqHolder;
 
 	@Setup
 	public void setup() {
@@ -57,10 +59,11 @@ public class MySqlSeqHolderBench {
 		config.addDataSourceProperty("cachePrepStmts", "true");
 		config.addDataSourceProperty("prepStmtCacheSize", "100");
 		config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-		MySqlSynchronizer synchronizer = new MySqlSynchronizer("seq_bench", new HikariDataSource(config));
-		synchronizer.createTable();
+        synchronizer = new MySqlSynchronizer("seq_bench", new HikariDataSource(config));
+		synchronizer.init();
 		seqHolder = new SeqHolder(synchronizer, "bench-test", LocalDateTime.now().toString(), BenchParam.SEQ_INIT_VAL,
 				BenchParam.SEQ_POOL_SIZE, null);
+        seqHolder.prepare();
 	}
 
 	@Benchmark

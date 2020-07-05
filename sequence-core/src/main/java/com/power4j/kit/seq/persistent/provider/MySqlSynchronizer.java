@@ -18,7 +18,6 @@ package com.power4j.kit.seq.persistent.provider;
 
 import com.power4j.kit.seq.core.exceptions.SeqException;
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
-import com.power4j.kit.seq.persistent.AddState;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,7 +35,7 @@ import java.util.Optional;
  */
 @Slf4j
 @AllArgsConstructor
-public class MySqlSynchronizer implements SeqSynchronizer {
+public class MySqlSynchronizer extends AbstractJdbcSynchronizer implements SeqSynchronizer {
 
 	// @formatter:off
 
@@ -66,7 +65,8 @@ public class MySqlSynchronizer implements SeqSynchronizer {
 
 	private final DataSource dataSource;
 
-	public void createTable() {
+	@Override
+	public void createMissingTable() {
 		log.info("create table if not exists : {}", tableName);
 		final String sql = MYSQL_CREATE_TABLE.replace("$TABLE_NAME", tableName);
 		log.debug(sql);
@@ -79,6 +79,7 @@ public class MySqlSynchronizer implements SeqSynchronizer {
 		}
 	}
 
+	@Override
 	public void dropTable() {
 		log.warn("drop table if exists : {}", tableName);
 		final String sql = MYSQL_DROP_TABLE.replace("$TABLE_NAME", tableName);
@@ -93,59 +94,7 @@ public class MySqlSynchronizer implements SeqSynchronizer {
 	}
 
 	@Override
-	public boolean tryCreate(String name, String partition, long nextValue) {
-		try (Connection connection = getConnection()) {
-			return createIgnoreInternal(connection, name, partition, nextValue);
-		}
-		catch (SQLException e) {
-			log.warn(e.getMessage(), e);
-			throw new SeqException(e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public boolean tryUpdate(String name, String partition, long nextValueOld, long nextValueNew) {
-		try (Connection connection = getConnection()) {
-			return updateInternal(connection, name, partition, nextValueOld, nextValueNew);
-		}
-		catch (SQLException e) {
-			log.warn(e.getMessage(), e);
-			throw new SeqException(e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public AddState tryAddAndGet(String name, String partition, int delta, int maxReTry) {
-		int totalOps = 0;
-		try (Connection connection = getConnection()) {
-			do {
-				++totalOps;
-				long lastValue = selectInternal(connection, name, partition).get();
-				final long target = lastValue + delta;
-				if (updateInternal(connection, name, partition, lastValue, target)) {
-					return AddState.success(lastValue, target, totalOps);
-				}
-			}
-			while (maxReTry < 0 || totalOps <= maxReTry + 1);
-			return AddState.fail(totalOps);
-		}
-		catch (SQLException e) {
-			log.warn(e.getMessage(), e);
-			throw new SeqException(e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public Optional<Long> getNextValue(String name, String partition) {
-		try (Connection connection = getConnection()) {
-			return selectInternal(connection, name, partition);
-		}
-		catch (SQLException e) {
-			throw new SeqException(e.getMessage(), e);
-		}
-	}
-
-	protected Optional<Long> selectInternal(Connection connection, String name, String partition) throws SQLException {
+	protected Optional<Long> selectSeqValue(Connection connection, String name, String partition) throws SQLException {
 		final String sql = MYSQL_SELECT_VALUE.replace("$TABLE_NAME", tableName);
 		log.debug(sql);
 		try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -164,7 +113,8 @@ public class MySqlSynchronizer implements SeqSynchronizer {
 		}
 	}
 
-	protected boolean createIgnoreInternal(Connection connection, String name, String partition, long nextValue)
+	@Override
+	protected boolean createMissingSeqEntry(Connection connection, String name, String partition, long nextValue)
 			throws SQLException {
 		final Timestamp now = Timestamp.valueOf(LocalDateTime.now());
 		final String sql = MYSQL_INSERT_IGNORE.replace("$TABLE_NAME", tableName);
@@ -182,7 +132,8 @@ public class MySqlSynchronizer implements SeqSynchronizer {
 		}
 	}
 
-	protected boolean updateInternal(Connection connection, String name, String partition, long nextValueOld,
+	@Override
+	protected boolean updateSeqValue(Connection connection, String name, String partition, long nextValueOld,
 			long nextValueNew) throws SQLException {
 		final Timestamp now = Timestamp.valueOf(LocalDateTime.now());
 		final String sql = MYSQL_UPDATE_VALUE.replace("$TABLE_NAME", tableName);
@@ -201,6 +152,7 @@ public class MySqlSynchronizer implements SeqSynchronizer {
 		}
 	}
 
+	@Override
 	protected Connection getConnection() {
 		try {
 			return dataSource.getConnection();
@@ -210,5 +162,4 @@ public class MySqlSynchronizer implements SeqSynchronizer {
 			throw new SeqException(e.getMessage(), e);
 		}
 	}
-
 }

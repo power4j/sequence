@@ -76,7 +76,6 @@ public class SeqHolder {
 		this.initValue = initValue;
 		this.poolSize = poolSize;
 		this.seqFormatter = seqFormatter == null ? SeqFormatter.DEFAULT_FORMAT : seqFormatter;
-		seqPool = fetch();
 	}
 
 	/**
@@ -112,6 +111,21 @@ public class SeqHolder {
 		return pull();
 	}
 
+    /**
+     * 默认的初始化是懒加载,执行此方法可以实现收到初始化
+     */
+	public void prepare(){
+        wLock.lock();
+        try {
+            if(seqPool == null){
+                seqPool = fetch();
+            }
+        }
+        finally {
+            wLock.unlock();
+        }
+    }
+
 	private final Optional<Long> pull() {
 		Optional<Long> val;
 		wLock.lock();
@@ -138,10 +152,6 @@ public class SeqHolder {
 		return next().map(n -> seqFormatter.format(name, currentPartitionRef.get(), n));
 	}
 
-	private boolean noMore(LongSeqPool seqPool) {
-		return seqPool == null || !seqPool.hasMore();
-	}
-
 	private LongSeqPool fetch() {
 		pollCount.incrementAndGet();
 		String partition = partitionFunc.get();
@@ -155,6 +165,10 @@ public class SeqHolder {
 		}
 	}
 
+    /**
+     * 从后端拉取值的次数
+     * @return
+     */
 	public long getPullCount() {
 		return pollCount.get();
 	}

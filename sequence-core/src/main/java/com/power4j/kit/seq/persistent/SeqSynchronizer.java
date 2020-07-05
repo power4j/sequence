@@ -22,7 +22,7 @@ import java.util.Optional;
  * Seq记录同步接口 <br/>
  * <ul>
  * <li>Seq记录唯一性 = 名称 + 分区</li>
- * <li>此接口的所有方法实现必须提供线程安全保障</li>
+ * <li>此接口的所有方法除非特别说明,默认必须提供线程安全保障</li>
  * </ul>
  *
  * @author CJ (jclazz@outlook.com)
@@ -68,4 +68,25 @@ public interface SeqSynchronizer {
 	 */
 	Optional<Long> getNextValue(String name, String partition);
 
+    /**
+     * 执行初始化.
+     * <p><b>无线程线程安全保障,但是可以多次执行</b></p>。
+     */
+	void init();
+
+    /**
+     * 查询语句总共执行的次数
+     * @return
+     */
+    default long getQueryCount() {
+        return 0L;
+    }
+
+    /**
+     * 更新语句总共执行的次数
+     * @return
+     */
+    default long getUpdateCount() {
+        return 0L;
+    }
 }

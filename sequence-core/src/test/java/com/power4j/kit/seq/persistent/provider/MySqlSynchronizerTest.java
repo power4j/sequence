@@ -37,7 +37,7 @@ public class MySqlSynchronizerTest extends SynchronizerTestCase {
 	@Before
 	public void prepare() {
 		mySqlSynchronizer = new MySqlSynchronizer(SEQ_TABLE, TestDataSources.getMySqlDataSource());
-		mySqlSynchronizer.createTable();
+		mySqlSynchronizer.createMissingTable();
 	}
 
 	@After

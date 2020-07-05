@@ -31,7 +31,10 @@ public class TestDataSources {
 	public final static String MYSQL_JDBC_URL = "jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false";
 
 	public static DataSource getMySqlDataSource() {
-		String pwd = System.getenv("MYSQL_TEST_PWD");
+        String pwd = System.getenv("MYSQL_TEST_PWD");
+		if(pwd != null && !pwd.trim().isEmpty()){
+		    System.out.println("Use MYSQL_TEST_PWD environment");
+        }
 		HikariConfig config = new HikariConfig();
 		config.setJdbcUrl(MYSQL_JDBC_URL);
 		config.setUsername("root");
