@@ -14,40 +14,48 @@
  * limitations under the License.
  */
 
-package com.power4j.kit.seq.persistent.provider;
+package com.power4j.kit.seq.persistent;
 
-import com.power4j.kit.seq.persistent.SeqSynchronizer;
-import org.junit.After;
-import org.junit.Before;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 /**
- * Mysql 测试
- * <p>
+ * 加法操作执行结果
  *
  * @author CJ (jclazz@outlook.com)
- * @date 2020/7/3
+ * @date 2020/7/2
  * @since 1.0
  */
-public class MySqlSynchronizerTest extends SynchronizerTestCase {
+@Data
+@AllArgsConstructor
+public class AddState {
 
-	public final static String SEQ_TABLE = "tb_seq";
+	/**
+	 * 执行结果
+	 */
+	private boolean success;
 
-	private MySqlSynchronizer mySqlSynchronizer;
+	/**
+	 * 前一个值
+	 */
+	private Long previous;
 
-	@Before
-	public void prepare() {
-		mySqlSynchronizer = new MySqlSynchronizer(SEQ_TABLE, TestDataSources.getMySqlDataSource());
-		mySqlSynchronizer.createTable();
+	/**
+	 * 当前值
+	 */
+	private Long current;
+
+	/**
+	 * 操作次数
+	 */
+	private int totalOps;
+
+	public static AddState fail(int totalOps) {
+		return new AddState(false, null, null, totalOps);
 	}
 
-	@After
-	public void teardown() {
-		mySqlSynchronizer.dropTable();
-	}
-
-	@Override
-	protected SeqSynchronizer getSeqSynchronizer() {
-		return mySqlSynchronizer;
+	public static AddState success(long previous, long current, int totalOps) {
+		return new AddState(true, previous, current, totalOps);
 	}
 
 }

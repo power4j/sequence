@@ -14,25 +14,35 @@
  * limitations under the License.
  */
 
-package com.power4j.kit.seq.core.exceptions;
+package com.power4j.kit.seq.persistent;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.function.Supplier;
 
 /**
+ * 预置动态分区方法
+ *
  * @author CJ (jclazz@outlook.com)
- * @date 2020/6/30
+ * @date 2020/7/5
  * @since 1.0
  */
-public class SeqException extends RuntimeException {
+public interface Partitions {
 
-	public SeqException(String message) {
-		super(message);
-	}
+	/**
+	 * 按年份分区
+	 */
+	Supplier<String> ANNUALLY = () -> LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy"));
 
-	public SeqException(String message, Throwable cause) {
-		super(message, cause);
-	}
+	/**
+	 * 按月份分区
+	 */
+	Supplier<String> MONTHLY = () -> LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
 
-	public SeqException(Throwable cause) {
-		super(cause);
-	}
+	/**
+	 * 按日期分区
+	 */
+	Supplier<String> DAILY = () -> LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
 }
