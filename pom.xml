@@ -81,8 +81,10 @@
   </dependencies>
 
   <modules>
-    <module>sequence-core</module>
+    <module>examples</module>
     <module>bench-test</module>
+    <module>sequence-core</module>
+    <module>sequence-spring-boot-starter</module>
   </modules>
 
   <dependencyManagement>

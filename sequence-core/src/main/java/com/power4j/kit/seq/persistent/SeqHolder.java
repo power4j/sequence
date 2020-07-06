@@ -18,6 +18,8 @@ package com.power4j.kit.seq.persistent;
 
 import com.power4j.kit.seq.core.LongSeqPool;
 import com.power4j.kit.seq.core.SeqFormatter;
+import com.power4j.kit.seq.core.Sequence;
+import com.power4j.kit.seq.core.exceptions.SeqException;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
@@ -33,7 +35,7 @@ import java.util.function.Supplier;
  * @date 2020/7/3
  * @since 1.0
  */
-public class SeqHolder {
+public class SeqHolder implements Sequence<Long> {
 
 	private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
 
@@ -92,17 +94,27 @@ public class SeqHolder {
 		this(seqSynchronizer, name, () -> partition, initValue, poolSize, seqFormatter);
 	}
 
-	/**
-	 * 取值
-	 * @return
-	 */
-	public Optional<Long> next() {
+	@Override
+	public String getName() {
+		rLock.lock();
+		try {
+			return seqPool == null ? name : seqPool.getName();
+		}
+		finally {
+			rLock.unlock();
+		}
+	}
+
+	@Override
+	public Optional<Long> nextOpt() {
 		Optional<Long> val;
 		rLock.lock();
 		try {
-			val = seqPool == null ? Optional.empty() : seqPool.nextOpt();
-			if (val.isPresent()) {
-				return val;
+			if (partitionFunc.get().equals(currentPartitionRef.get())) {
+				val = (seqPool == null ? Optional.empty() : seqPool.nextOpt());
+				if (val.isPresent()) {
+					return val;
+				}
 			}
 		}
 		finally {
@@ -111,26 +123,39 @@ public class SeqHolder {
 		return pull();
 	}
 
-    /**
-     * 默认的初始化是懒加载,执行此方法可以实现收到初始化
-     */
-	public void prepare(){
-        wLock.lock();
-        try {
-            if(seqPool == null){
-                seqPool = fetch();
-            }
-        }
-        finally {
-            wLock.unlock();
-        }
-    }
+	@Override
+	public Long next() {
+		return nextOpt().get();
+	}
+
+	@Override
+	public Optional<String> nextStrOpt() throws SeqException {
+		return nextOpt().map(n -> seqFormatter.format(name, currentPartitionRef.get(), n));
+	}
+
+	/**
+	 * 默认的初始化是懒加载,执行此方法可以实现收到初始化
+	 */
+	public void prepare() {
+		wLock.lock();
+		try {
+			if (seqPool == null) {
+				seqPool = fetch();
+			}
+		}
+		finally {
+			wLock.unlock();
+		}
+	}
 
 	private final Optional<Long> pull() {
 		Optional<Long> val;
 		wLock.lock();
 		try {
-			val = (seqPool == null ? fetch() : seqPool).nextOpt();
+			if (seqPool == null || !partitionFunc.get().equals(currentPartitionRef.get())) {
+				seqPool = fetch();
+			}
+			val = seqPool.nextOpt();
 			if (!val.isPresent()) {
 				val = (seqPool = fetch()).nextOpt();
 				if (!val.isPresent()) {
@@ -144,31 +169,26 @@ public class SeqHolder {
 		}
 	}
 
-	/**
-	 * 取值并且格式化
-	 * @return
-	 */
-	public Optional<String> nextFormatted() {
-		return next().map(n -> seqFormatter.format(name, currentPartitionRef.get(), n));
-	}
-
 	private LongSeqPool fetch() {
 		pollCount.incrementAndGet();
+		LongSeqPool seqPool;
 		String partition = partitionFunc.get();
 		if (seqSynchronizer.tryCreate(name, partition, initValue + poolSize)) {
-			currentPartitionRef.set(partition);
-			return LongSeqPool.forSize(makePoolName(name, partition), initValue, poolSize, false);
+			seqPool = LongSeqPool.forSize(makePoolName(name, partition), initValue, poolSize, false);
 		}
 		else {
 			AddState state = seqSynchronizer.tryAddAndGet(name, partition, poolSize, -1);
-			return LongSeqPool.forRange(makePoolName(name, partition), state.getPrevious(), state.getCurrent(), false);
+			seqPool = LongSeqPool.forRange(makePoolName(name, partition), state.getPrevious(), state.getCurrent(),
+					false);
 		}
+		currentPartitionRef.set(partition);
+		return seqPool;
 	}
 
-    /**
-     * 从后端拉取值的次数
-     * @return
-     */
+	/**
+	 * 从后端拉取值的次数
+	 * @return
+	 */
 	public long getPullCount() {
 		return pollCount.get();
 	}

@@ -33,6 +33,7 @@ public class LongSeqPoolTest {
 		long start = LongSeqPool.MIN_VALUE;
 		int size = 2;
 		LongSeqPool pool = LongSeqPool.forSize(poolName, start, size, false);
+		assertEquals(pool.minValue().longValue(), start);
 		assertEquals(pool.capacity(), size);
 		assertEquals(pool.remaining(), size);
 		assertEquals(pool.peek().longValue(), start);
@@ -50,6 +51,8 @@ public class LongSeqPoolTest {
 		long start = LongSeqPool.MAX_VALUE;
 		int size = 1;
 		LongSeqPool pool = LongSeqPool.forSize(poolName, start, size, false);
+		assertEquals(pool.minValue().longValue(), start);
+		assertEquals(pool.maxValue().longValue(), start);
 		assertEquals(pool.capacity(), size);
 		assertEquals(pool.remaining(), size);
 		assertEquals(pool.peek().longValue(), start);
@@ -134,7 +137,7 @@ public class LongSeqPoolTest {
 	}
 
 	@Test
-	public void threadSafeTest() {
+	public void threadSafetyTest() {
 
 		final int threads = Runtime.getRuntime().availableProcessors() * 2 + 1;
 		final long start = 0L;

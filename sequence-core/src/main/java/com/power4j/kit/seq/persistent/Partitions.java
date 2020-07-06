@@ -38,11 +38,11 @@ public interface Partitions {
 	/**
 	 * 按月份分区
 	 */
-	Supplier<String> MONTHLY = () -> LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
+	Supplier<String> MONTHLY = () -> LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
 
 	/**
 	 * 按日期分区
 	 */
-	Supplier<String> DAILY = () -> LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+	Supplier<String> DAILY = () -> LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
 }

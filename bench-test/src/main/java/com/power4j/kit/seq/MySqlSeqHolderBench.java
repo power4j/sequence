@@ -46,7 +46,8 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.SECONDS)
 public class MySqlSeqHolderBench {
 
-    private static SeqSynchronizer synchronizer;
+	private static SeqSynchronizer synchronizer;
+
 	private static SeqHolder seqHolder;
 
 	@Setup
@@ -59,16 +60,16 @@ public class MySqlSeqHolderBench {
 		config.addDataSourceProperty("cachePrepStmts", "true");
 		config.addDataSourceProperty("prepStmtCacheSize", "100");
 		config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-        synchronizer = new MySqlSynchronizer("seq_bench", new HikariDataSource(config));
+		synchronizer = new MySqlSynchronizer("seq_bench", new HikariDataSource(config));
 		synchronizer.init();
 		seqHolder = new SeqHolder(synchronizer, "bench-test", LocalDateTime.now().toString(), BenchParam.SEQ_INIT_VAL,
 				BenchParam.SEQ_POOL_SIZE, null);
-        seqHolder.prepare();
+		seqHolder.prepare();
 	}
 
 	@Benchmark
 	public void longSeqPoolTest() {
-		seqHolder.next().get();
+		seqHolder.next();
 	}
 
 	public static void main(String[] args) throws Exception {

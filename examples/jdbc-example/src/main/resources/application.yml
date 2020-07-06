@@ -1,0 +1,14 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: "jdbc:mysql://${MYSQL_HOST:localhost}:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false"
+    username: root
+    password: root
+
+power4j:
+  sequence:
+    # 数据同步使用的后端支持(如: mysql,oracle,redis)
+    backend: mysql

@@ -95,12 +95,12 @@ public abstract class AbstractJdbcSynchronizer implements SeqSynchronizer {
 	protected abstract boolean updateSeqValue(Connection connection, String name, String partition, long nextValueOld,
 			long nextValueNew) throws SQLException;
 
-    @Override
+	@Override
 	public long getQueryCount() {
 		return queryCount.get();
 	}
 
-    @Override
+	@Override
 	public long getUpdateCount() {
 		return updateCount.get();
 	}
@@ -136,10 +136,10 @@ public abstract class AbstractJdbcSynchronizer implements SeqSynchronizer {
 			do {
 				++totalOps;
 				long lastValue = selectSeqValue(connection, name, partition).get();
-                queryCount.incrementAndGet();
+				queryCount.incrementAndGet();
 				final long target = lastValue + delta;
 				boolean updateDone = updateSeqValue(connection, name, partition, lastValue, target);
-                updateCount.incrementAndGet();
+				updateCount.incrementAndGet();
 				if (updateDone) {
 					return AddState.success(lastValue, target, totalOps);
 				}
@@ -165,14 +165,14 @@ public abstract class AbstractJdbcSynchronizer implements SeqSynchronizer {
 		}
 	}
 
-    @Override
-    public void init() {
-        try {
-            createMissingTable();
-        }
-        catch (SQLException e) {
-            throw new SeqException(e.getMessage(), e);
-        }
-    }
+	@Override
+	public void init() {
+		try {
+			createMissingTable();
+		}
+		catch (SQLException e) {
+			throw new SeqException(e.getMessage(), e);
+		}
+	}
 
 }

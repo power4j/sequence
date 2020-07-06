@@ -162,4 +162,5 @@ public class MySqlSynchronizer extends AbstractJdbcSynchronizer implements SeqSy
 			throw new SeqException(e.getMessage(), e);
 		}
 	}
+
 }

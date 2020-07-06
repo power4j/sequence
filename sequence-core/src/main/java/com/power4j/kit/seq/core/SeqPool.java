@@ -16,11 +16,6 @@
 
 package com.power4j.kit.seq.core;
 
-import com.power4j.kit.seq.core.exceptions.SeqException;
-
-import java.util.Optional;
-import java.util.function.Function;
-
 /**
  * 序号池
  *
@@ -28,26 +23,7 @@ import java.util.function.Function;
  * @date 2020/6/30
  * @since 1.0
  */
-public interface SeqPool<T, S extends SeqPool<T, S>> {
-
-	/**
-	 * 名称
-	 * @return
-	 */
-	String getName();
-
-	/**
-	 * 取值
-	 * @return
-	 * @throws SeqException 号池耗尽抛出异常
-	 */
-	T next() throws SeqException;
-
-	/**
-	 * 取值
-	 * @return
-	 */
-	Optional<T> nextOpt();
+public interface SeqPool<T, S extends SeqPool<T, S>> extends Sequence<T> {
 
 	/**
 	 * 查看当前计数器的值,注意此方法不能保证取值的有效性
@@ -91,15 +67,5 @@ public interface SeqPool<T, S extends SeqPool<T, S>> {
 	 * @return
 	 */
 	T maxValue();
-
-	/**
-	 * 取值并转换
-	 * @param converter
-	 * @return
-	 * @throws SeqException 号池耗尽抛出异常
-	 */
-	default <R> R next(Function<T, R> converter) throws SeqException {
-		return converter.apply(next());
-	}
 
 }

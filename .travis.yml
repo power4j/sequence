@@ -21,14 +21,17 @@ cache:
 
 # https://docs.travis-ci.com/user/job-lifecycle/
 script:
-  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V -P '!aliyun-repo,travis-ci'
-  - mvn test -B -P '!aliyun-repo,travis-ci'
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V -P '!aliyun-repo,!oss-release,travis-ci'
+  - mvn test -B -P '!aliyun-repo,!oss-release,travis-ci'
 
 # This is to enable CodeCov's coverage
 # If a build is successful, the code is submitted for coverage analysis
 # export CODECOV_TOKEN="xxx"
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+
+before_script:
+  - git config --global core.autocrlf input
 
 before_install:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'

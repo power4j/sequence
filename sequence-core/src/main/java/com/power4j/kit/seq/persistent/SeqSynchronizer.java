@@ -68,25 +68,29 @@ public interface SeqSynchronizer {
 	 */
 	Optional<Long> getNextValue(String name, String partition);
 
-    /**
-     * 执行初始化.
-     * <p><b>无线程线程安全保障,但是可以多次执行</b></p>。
-     */
+	/**
+	 * 执行初始化.
+	 * <p>
+	 * <b>无线程线程安全保障,但是可以多次执行</b>
+	 * </p>
+	 * 。
+	 */
 	void init();
 
-    /**
-     * 查询语句总共执行的次数
-     * @return
-     */
-    default long getQueryCount() {
-        return 0L;
-    }
+	/**
+	 * 查询语句总共执行的次数
+	 * @return
+	 */
+	default long getQueryCount() {
+		return 0L;
+	}
 
-    /**
-     * 更新语句总共执行的次数
-     * @return
-     */
-    default long getUpdateCount() {
-        return 0L;
-    }
+	/**
+	 * 更新语句总共执行的次数
+	 * @return
+	 */
+	default long getUpdateCount() {
+		return 0L;
+	}
+
 }

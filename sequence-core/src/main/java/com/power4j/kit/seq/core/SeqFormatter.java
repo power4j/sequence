@@ -26,7 +26,7 @@ package com.power4j.kit.seq.core;
 @FunctionalInterface
 public interface SeqFormatter {
 
-	SeqFormatter DEFAULT_FORMAT = (seqName, partition, value) -> String.format("%s-%08d", partition, value);
+	SeqFormatter DEFAULT_FORMAT = (seqName, partition, value) -> String.format("%s%08d", partition, value);
 
 	/**
 	 * 格式化

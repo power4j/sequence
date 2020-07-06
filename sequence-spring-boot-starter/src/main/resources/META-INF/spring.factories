@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.power4j.kit.seq.spring.boot.autoconfigure.SequenceAutoConfigure

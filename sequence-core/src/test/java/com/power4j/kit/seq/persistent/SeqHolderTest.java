@@ -53,11 +53,11 @@ public class SeqHolderTest {
 		final String seqName = "power4j";
 		final long initValue = LongSeqPool.MIN_VALUE;
 		final int size = 10;
-		SeqHolder holder = new SeqHolder(mySqlSynchronizer, seqName, () -> LocalDateTime.now().toString(), initValue,
-				size, null);
+		SeqHolder holder = new SeqHolder(mySqlSynchronizer, seqName, LocalDateTime.now().toString(), initValue, size,
+				null);
 		for (int loop = 0; loop < 10; ++loop) {
 			for (int i = 0; i < size; ++i) {
-				System.out.println(holder.nextFormatted().get());
+				System.out.println(holder.nextStr());
 			}
 			System.out.println(String.format("pull count = %d", holder.getPullCount()));
 			Assert.assertTrue(holder.getPullCount() == loop + 1);
@@ -77,13 +77,13 @@ public class SeqHolderTest {
 
 		SeqHolder holder = new SeqHolder(mySqlSynchronizer, seqName, () -> LocalDateTime.now().toString(), initValue,
 				size, null);
-        holder.prepare();
+		holder.prepare();
 		for (int t = 0; t < threads; ++t) {
 			CompletableFuture.runAsync(() -> {
 				threadReady.countDown();
 				wait(threadReady);
 				for (int i = 0; i < size; ++i) {
-					long val = holder.next().get();
+					long val = holder.next();
 					got.incrementAndGet();
 					Assert.assertTrue(val >= initValue);
 				}
@@ -97,9 +97,8 @@ public class SeqHolderTest {
 		wait(threadDone);
 		System.out.println(String.format("pull count = %d , except = %d", got.get(), size * threads));
 
-        System.out.println(String.format("synchronizer query count = %d , update count = %d",
-                mySqlSynchronizer.getQueryCount(),
-                mySqlSynchronizer.getUpdateCount()));
+		System.out.println(String.format("synchronizer query count = %d , update count = %d",
+				mySqlSynchronizer.getQueryCount(), mySqlSynchronizer.getUpdateCount()));
 
 		Assert.assertTrue(got.get() == size * threads);
 	}

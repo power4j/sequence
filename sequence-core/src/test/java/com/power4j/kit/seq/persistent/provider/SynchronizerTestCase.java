@@ -117,9 +117,8 @@ public abstract class SynchronizerTestCase {
 		long lastValue = seqSynchronizer.getNextValue(seqName, partition).get();
 		System.out.println(String.format("lastValue value = %d , update count = %d", lastValue, updateCount.get()));
 
-        System.out.println(String.format("synchronizer query count = %d , update count = %d",
-                seqSynchronizer.getQueryCount(),
-                seqSynchronizer.getUpdateCount()));
+		System.out.println(String.format("synchronizer query count = %d , update count = %d",
+				seqSynchronizer.getQueryCount(), seqSynchronizer.getUpdateCount()));
 
 		Assert.assertTrue(lastValue == finalValue);
 	}
@@ -174,9 +173,8 @@ public abstract class SynchronizerTestCase {
 		long lastValue = seqSynchronizer.getNextValue(seqName, partition).get();
 		System.out.println(String.format("lastValue value = %d , operate count = %d", lastValue, opCount.get()));
 
-        System.out.println(String.format("synchronizer query count = %d , update count = %d",
-                seqSynchronizer.getQueryCount(),
-                seqSynchronizer.getUpdateCount()));
+		System.out.println(String.format("synchronizer query count = %d , update count = %d",
+				seqSynchronizer.getQueryCount(), seqSynchronizer.getUpdateCount()));
 
 		Assert.assertTrue(lastValue == finalValue + threads - 1);
 	}
