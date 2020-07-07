@@ -71,6 +71,9 @@ node_modules
 *.log
 rebel.xml
 *.xml.versionsBackup
+*.xml.releaseBackup
+pom.xml.next
+release.properties
 .metadata/
 settings-ossrh.xml
 
