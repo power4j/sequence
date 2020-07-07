@@ -28,21 +28,24 @@ import javax.sql.DataSource;
  */
 public class TestDataSources {
 
-	public final static String MYSQL_JDBC_URL = "jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false";
+	public final static String MYSQL_JDBC_URL_TEMPLATE = "jdbc:mysql://%s:%s/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false";
 
 	public static DataSource getMySqlDataSource() {
-		String pwd = System.getenv("MYSQL_TEST_PWD");
-		if (pwd != null && !pwd.trim().isEmpty()) {
-			System.out.println("Use MYSQL_TEST_PWD environment");
-		}
+		String jdbcUrl = String.format(MYSQL_JDBC_URL_TEMPLATE, getEnvOrDefault("TEST_MYSQL_HOST", "127.0.0.1"),
+				getEnvOrDefault("TEST_MYSQL_PORT", "3306"));
 		HikariConfig config = new HikariConfig();
-		config.setJdbcUrl(MYSQL_JDBC_URL);
-		config.setUsername("root");
-		config.setPassword(pwd == null ? "" : pwd.trim());
+		config.setJdbcUrl(jdbcUrl);
+		config.setUsername(getEnvOrDefault("TEST_MYSQL_USER", "root"));
+		config.setPassword(getEnvOrDefault("TEST_MYSQL_PWD", ""));
 		config.addDataSourceProperty("cachePrepStmts", "true");
 		config.addDataSourceProperty("prepStmtCacheSize", "100");
 		config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
 		return new HikariDataSource(config);
+	}
+
+	public static String getEnvOrDefault(String envKey, String defValue) {
+		String val = System.getenv(envKey);
+		return val != null ? val : defValue;
 	}
 
 }
