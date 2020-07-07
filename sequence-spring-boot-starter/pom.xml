@@ -25,6 +25,9 @@
   </parent>
 
   <artifactId>sequence-spring-boot-starter</artifactId>
+  
+  <url>https://github.com/power4j/sequence</url>
+  <description>Spring Boot support</description>
 
   <dependencies>
     <dependency>

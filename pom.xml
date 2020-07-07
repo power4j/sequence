@@ -25,6 +25,9 @@
   <name>${project.artifactId}</name>
   <packaging>pom</packaging>
 
+  <url>https://github.com/power4j/sequence</url>
+  <description>Java Sequence tool</description>
+
   <licenses>
     <license>
       <name>GNU LESSER GENERAL PUBLIC LICENSE 3.0</name>
@@ -39,7 +42,7 @@
   </organization>
 
   <scm>
-    <url>https://github.com/ribasco/async-gamequery-lib</url>
+    <url>https://github.com/power4j/sequence</url>
     <connection>scm:git:git://github.com/power4j/sequence.git</connection>
     <developerConnection>scm:git:https://github.com/power4j/sequence.git</developerConnection>
   </scm>

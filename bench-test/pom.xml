@@ -26,6 +26,9 @@
 
   <artifactId>bench-test</artifactId>
 
+  <url>https://github.com/power4j/sequence</url>
+  <description>performance test</description>
+
   <properties>
     <maven.deploy.skip>true</maven.deploy.skip>
     <jmh.version>1.23</jmh.version>

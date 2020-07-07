@@ -10,6 +10,8 @@
   <artifactId>jdbc-example</artifactId>
   <name>jdbc-example</name>
 
+  <description>Spring Boot web app example</description>
+
   <properties>
     <java.version>1.8</java.version>
     <power4j.sequence.version>1.0.1-SNAPSHOT</power4j.sequence.version>
