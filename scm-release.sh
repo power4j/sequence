@@ -5,4 +5,6 @@ export TEST_MYSQL_PORT=3306
 export TEST_MYSQL_USER=root
 export TEST_MYSQL_PWD=root
 
-mvn -B release:clean release:prepare release:perform
+mvn release:clean -P 'oss-release,aliyun-repo' && \
+mvn release:prepare -P 'oss-release,aliyun-repo' && \
+mvn release:perform -P 'oss-release,aliyun-repo'
