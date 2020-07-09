@@ -3,7 +3,7 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/power4j/sequence/badge/master)](https://www.codefactor.io/repository/github/power4j/sequence/overview/master)
 [![codebeat badge](https://codebeat.co/badges/abec5291-8b69-408d-8515-ed65951f7eb5)](https://codebeat.co/projects/github-com-power4j-sequence-master)
 [![codecov](https://codecov.io/gh/power4j/sequence/branch/master/graph/badge.svg)](https://codecov.io/gh/power4j/sequence)
-[![travis-ci](https://travis-ci.org/power4j/sequence.svg?branch=master)](https://travis-ci.org/github/power4j/sequence)
+[![travis-ci](https://travis-ci.org/power4j/sequence.svg)](https://travis-ci.org/github/power4j/sequence)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.power4j.kit/sequence/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cz.jirutka.rsql/rsql-parser)
 
 使用场景
@@ -50,19 +50,18 @@ power4j:
 public class SequenceExampleApplication {
     @Autowired
     private Sequence<Long> sequence;
+    public static void main(String[] args) {
+        SpringApplication.run(SequenceExampleApplication.class, args);
+    }
 
-	public static void main(String[] args) {
-		SpringApplication.run(SequenceExampleApplication.class, args);
-	}
-
-	@GetMapping("/seq")
-	public List<String> getSequence(@RequestParam(required = false) Integer size){
-	    size = (size == null || size <= 0) ? 10 : size;
-	    List<String> list = new ArrayList<>(size);
-	    for (int i=0; i<size; ++i) {
-	        list.add(sequence.nextStr());
+    @GetMapping("/seq")
+    public List<String> getSequence(@RequestParam(required = false) Integer size) {
+        size = (size == null || size <= 0) ? 10 : size;
+        List<String> list = new ArrayList<>(size);
+        for (int i = 0; i < size; ++i) {
+            list.add(sequence.nextStr());
         }
-	    return list;
+        return list;
     }
 }
 ```

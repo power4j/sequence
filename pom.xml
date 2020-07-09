@@ -162,6 +162,8 @@
         <version>2.5.3</version>
         <configuration>
           <scmCommentPrefix>[release]</scmCommentPrefix>
+          <tagNameFormat>@{project.version}</tagNameFormat>
+          <goals>deploy</goals>
         </configuration>
       </plugin>
     </plugins>

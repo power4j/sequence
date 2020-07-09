@@ -134,7 +134,7 @@ public class SeqHolder implements Sequence<Long> {
 	}
 
 	/**
-	 * 默认的初始化是懒加载,执行此方法可以实现收到初始化
+	 * 默认的初始化是懒加载,执行此方法可以手动初始化
 	 */
 	public void prepare() {
 		wLock.lock();
@@ -147,6 +147,15 @@ public class SeqHolder implements Sequence<Long> {
 			wLock.unlock();
 		}
 	}
+
+
+    /**
+     * 从后端拉取值的次数
+     * @return
+     */
+    public long getPullCount() {
+        return pollCount.get();
+    }
 
 	private final Optional<Long> pull() {
 		Optional<Long> val;
@@ -185,15 +194,7 @@ public class SeqHolder implements Sequence<Long> {
 		return seqPool;
 	}
 
-	/**
-	 * 从后端拉取值的次数
-	 * @return
-	 */
-	public long getPullCount() {
-		return pollCount.get();
-	}
-
-	protected String makePoolName(String seqName, String window) {
+    private String makePoolName(String seqName, String window) {
 		return seqName + "/" + window;
 	}
 
