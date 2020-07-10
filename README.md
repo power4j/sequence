@@ -1,5 +1,4 @@
-# JAVA 序号工具包  [![gplv3](docs/assets/img/gplv3-88x31.png)](http://www.gnu.org/licenses/lgpl-3.0.html)
-
+# JAVA 序号工具包 Sequence
 [![CodeFactor](https://www.codefactor.io/repository/github/power4j/sequence/badge/master)](https://www.codefactor.io/repository/github/power4j/sequence/overview/master)
 [![codebeat badge](https://codebeat.co/badges/abec5291-8b69-408d-8515-ed65951f7eb5)](https://codebeat.co/projects/github-com-power4j-sequence-master)
 [![codecov](https://codecov.io/gh/power4j/sequence/branch/master/graph/badge.svg)](https://codecov.io/gh/power4j/sequence)
@@ -21,7 +20,7 @@
 ## 项目说明
 
 - ***JDK 版本要求: `JDK8+`*** 
-- 开源许可、代码质量分析、单元测试覆盖率、最新版本: 请查看顶部徽章
+
 
 ## 使用方法
 

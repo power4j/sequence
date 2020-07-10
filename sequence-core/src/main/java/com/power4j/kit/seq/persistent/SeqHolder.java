@@ -1,17 +1,13 @@
 /*
- * Copyright (c) 2020, ChenJun(powe4j@outlook.com).
- * <p>
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE 3.0;
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.gnu.org/licenses/lgpl-3.0.html
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2020 ChenJun(power4j@outlook.com)
+ * Sequence is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan PSL v2.
+ * You may obtain a copy of Mulan PSL v2 at:
+ *          http://license.coscl.org.cn/MulanPSL2
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ * See the Mulan PSL v2 for more details.
  */
 
 package com.power4j.kit.seq.persistent;
@@ -31,7 +27,7 @@ import java.util.function.Supplier;
 /**
  * 取号器
  *
- * @author CJ (jclazz@outlook.com)
+ * @author CJ (power4j@outlook.com)
  * @date 2020/7/3
  * @since 1.0
  */
@@ -148,14 +144,13 @@ public class SeqHolder implements Sequence<Long> {
 		}
 	}
 
-
-    /**
-     * 从后端拉取值的次数
-     * @return
-     */
-    public long getPullCount() {
-        return pollCount.get();
-    }
+	/**
+	 * 从后端拉取值的次数
+	 * @return
+	 */
+	public long getPullCount() {
+		return pollCount.get();
+	}
 
 	private final Optional<Long> pull() {
 		Optional<Long> val;
@@ -194,7 +189,7 @@ public class SeqHolder implements Sequence<Long> {
 		return seqPool;
 	}
 
-    private String makePoolName(String seqName, String window) {
+	private String makePoolName(String seqName, String window) {
 		return seqName + "/" + window;
 	}
 
