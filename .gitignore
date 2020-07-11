@@ -65,6 +65,8 @@ gen_code
 
 ### node ###
 node_modules
+!yarn.lock
+!package.lock
 
 ######################################################################
 # Others
