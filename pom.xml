@@ -20,7 +20,7 @@
 
   <groupId>com.power4j.kit</groupId>
   <artifactId>sequence</artifactId>
-  <version>1.1.1</version>
+  <version>1.2-SNAPSHOT</version>
   <name>${project.artifactId}</name>
   <packaging>pom</packaging>
 
@@ -44,7 +44,7 @@
     <url>https://github.com/power4j/sequence</url>
     <connection>scm:git:git://github.com/power4j/sequence.git</connection>
     <developerConnection>scm:git:https://github.com/power4j/sequence.git</developerConnection>
-    <tag>1.1.1</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <developers>
