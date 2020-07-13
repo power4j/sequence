@@ -36,7 +36,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RedisSynchronizerConfigure {
 
-	@Bean
+	@Bean(destroyMethod = "shutdown")
 	@ConditionalOnMissingBean
 	@ConditionalOnProperty(prefix = SequenceProperties.PREFIX, name = "backend", havingValue = "redis")
 	public RedisClient redisClient(SequenceProperties sequenceProperties) {
@@ -44,7 +44,7 @@ public class RedisSynchronizerConfigure {
 		return RedisClient.create(redisUri);
 	}
 
-	@Bean
+	@Bean(destroyMethod = "shutdown")
 	@ConditionalOnMissingBean
 	@ConditionalOnProperty(prefix = SequenceProperties.PREFIX, name = "backend", havingValue = "redis-cluster")
 	public RedisClusterClient redisClusterClient(SequenceProperties sequenceProperties) {
