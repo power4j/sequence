@@ -1,13 +1,17 @@
 /*
- * Copyright (c) 2020 ChenJun(power4j@outlook.com)
- * Sequence is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
+ * Copyright 2020 ChenJun (power4j@outlook.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.power4j.kit.seq.spring.boot.autoconfigure;
@@ -17,13 +21,13 @@ import com.power4j.kit.seq.core.Sequence;
 import com.power4j.kit.seq.persistent.Partitions;
 import com.power4j.kit.seq.persistent.SeqHolder;
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 /**
  * 自动配置
@@ -32,9 +36,10 @@ import org.springframework.context.annotation.Configuration;
  * @date 2020/7/6
  * @since 1.0
  */
+@Slf4j
 @Configuration
-@ComponentScan("com.power4j.kit.seq.spring.boot.autoconfigure")
-@AutoConfigureAfter(DataSourceAutoConfiguration.class)
+@EnableConfigurationProperties(SequenceProperties.class)
+@Import({ JdbcSynchronizerConfigure.class, RedisSynchronizerConfigure.class })
 public class SequenceAutoConfigure {
 
 	@Bean
@@ -42,6 +47,7 @@ public class SequenceAutoConfigure {
 	@ConditionalOnProperty(prefix = SequenceProperties.PREFIX, name = "enabled", havingValue = "true",
 			matchIfMissing = true)
 	public Sequence<Long> sequence(SequenceProperties sequenceProperties, SeqSynchronizer seqSynchronizer) {
+		log.info("Sequence create,Using {}", seqSynchronizer.getClass().getSimpleName());
 		// 按月分区:即每个月有 Long.MAX 个序号可用
 		SeqHolder holder = new SeqHolder(seqSynchronizer, sequenceProperties.getName(), Partitions.MONTHLY,
 				sequenceProperties.getStartValue(), sequenceProperties.getFetchSize(), SeqFormatter.DEFAULT_FORMAT);

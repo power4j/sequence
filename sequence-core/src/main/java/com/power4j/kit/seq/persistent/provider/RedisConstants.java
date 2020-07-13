@@ -16,40 +16,30 @@
 
 package com.power4j.kit.seq.persistent.provider;
 
-import com.power4j.kit.seq.persistent.SeqSynchronizer;
-import org.junit.After;
-import org.junit.Before;
-
 /**
- * Mysql 测试
- * <p>
- *
  * @author CJ (power4j@outlook.com)
- * @date 2020/7/3
- * @since 1.0
+ * @date 2020/7/13
+ * @since 1.1
  */
-public class MySqlSynchronizerTest extends SynchronizerTestCase {
+public interface RedisConstants {
 
-	public final static String SEQ_TABLE = "tb_seq";
+	// @formatter:off
 
-	private MySqlSynchronizer mySqlSynchronizer;
+	String KEY_DELIMITER =  ":";
 
-	@Before
-	public void prepare() {
-		mySqlSynchronizer = new MySqlSynchronizer(SEQ_TABLE, TestServices.getMySqlDataSource());
-		mySqlSynchronizer.createMissingTable();
-	}
+	String UPDATE_SCRIPT = "" +
+			"local key = KEYS[1]\n" +
+			"local old_val = ARGV[1]\n" +
+			"local new_val = ARGV[2]\n" +
+			"\n" +
+			"local val = redis.call(\"GET\", key)\n" +
+			"if val == old_val then\n" +
+			"    redis.call(\"SET\", key, new_val)\n" +
+			"    return true\n" +
+			"else\n" +
+			"    return false\n" +
+			"end";
 
-	@After
-	public void teardown() {
-		if (mySqlSynchronizer != null) {
-			mySqlSynchronizer.dropTable();
-		}
-	}
-
-	@Override
-	protected SeqSynchronizer getSeqSynchronizer() {
-		return mySqlSynchronizer;
-	}
+	// @formatter:on
 
 }

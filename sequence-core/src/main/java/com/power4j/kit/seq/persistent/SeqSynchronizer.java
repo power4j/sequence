@@ -1,13 +1,17 @@
 /*
- * Copyright (c) 2020 ChenJun(power4j@outlook.com)
- * Sequence is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
+ * Copyright 2020 ChenJun (power4j@outlook.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.power4j.kit.seq.persistent;
@@ -38,11 +42,15 @@ public interface SeqSynchronizer {
 
 	/**
 	 * 尝试更新记录
+	 * <p>
+	 * <b>此接口为可选实现接口</b>
+	 * </p>
 	 * @param name
 	 * @param partition
 	 * @param nextValueOld
 	 * @param nextValueNew
 	 * @return true 表示更新成功
+	 * @throws UnsupportedOperationException 不支持此方法
 	 */
 	boolean tryUpdate(String name, String partition, long nextValueOld, long nextValueNew);
 
@@ -51,13 +59,13 @@ public interface SeqSynchronizer {
 	 * @param name
 	 * @param partition
 	 * @param delta 加数
-	 * @param maxReTry 最大重试次数,小于0表示无限制. 0 表示重试零次(总共执行1次) 1 表示重试一次(总共执行2次)
+	 * @param maxReTry 最大重试次数,小于0表示无限制. 0 表示重试零次(总共执行1次) 1 表示重试一次(总共执行2次)。此参数跟具体的实现层有关。
 	 * @return 返回执行加法操作执行结果
 	 */
 	AddState tryAddAndGet(String name, String partition, int delta, int maxReTry);
 
 	/**
-	 * 获取值
+	 * 查询当前值
 	 * @param name
 	 * @param partition
 	 * @return 返回null表示记录不存在
@@ -74,10 +82,19 @@ public interface SeqSynchronizer {
 	void init();
 
 	/**
+	 * 关闭,执行资源清理.
+	 * <p>
+	 * <b>无线程线程安全保障,但是可以多次执行</b>
+	 * </p>
+	 * 。
+	 */
+	void shutdown();
+
+	/**
 	 * 查询语句总共执行的次数
 	 * @return
 	 */
-	default long getQueryCount() {
+	default long getQueryCounter() {
 		return 0L;
 	}
 
@@ -85,7 +102,7 @@ public interface SeqSynchronizer {
 	 * 更新语句总共执行的次数
 	 * @return
 	 */
-	default long getUpdateCount() {
+	default long getUpdateCounter() {
 		return 0L;
 	}
 

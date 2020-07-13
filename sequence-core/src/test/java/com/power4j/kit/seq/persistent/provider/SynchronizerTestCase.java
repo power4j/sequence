@@ -1,23 +1,28 @@
 /*
- * Copyright (c) 2020 ChenJun(power4j@outlook.com)
- * Sequence is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
+ * Copyright 2020 ChenJun (power4j@outlook.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.power4j.kit.seq.persistent.provider;
 
-import com.power4j.kit.seq.persistent.SeqSynchronizer;
 import com.power4j.kit.seq.persistent.AddState;
+import com.power4j.kit.seq.persistent.SeqSynchronizer;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
@@ -35,6 +40,10 @@ public abstract class SynchronizerTestCase {
 
 	protected abstract SeqSynchronizer getSeqSynchronizer();
 
+	protected String StrNow() {
+		return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+	}
+
 	/**
 	 * 一般使用步骤测试
 	 */
@@ -42,7 +51,7 @@ public abstract class SynchronizerTestCase {
 	public void simpleTest() {
 		final SeqSynchronizer seqSynchronizer = getSeqSynchronizer();
 		final String seqName = "power4j";
-		final String partition = LocalDateTime.now().toString();
+		final String partition = StrNow();
 		final long initValue = 1000L;
 		final long newValue = 1L;
 		seqSynchronizer.tryCreate(seqName, partition, initValue);
@@ -70,7 +79,7 @@ public abstract class SynchronizerTestCase {
 	public void multipleThreadUpdateTest() {
 		final SeqSynchronizer seqSynchronizer = getSeqSynchronizer();
 		final String seqName = "power4j";
-		final String partition = LocalDateTime.now().toString();
+		final String partition = StrNow();
 		final long initValue = 1L;
 		final long finalValue = 1000L;
 		final int delta = 1;
@@ -114,7 +123,7 @@ public abstract class SynchronizerTestCase {
 		System.out.println(String.format("lastValue value = %d , update count = %d", lastValue, updateCount.get()));
 
 		System.out.println(String.format("synchronizer query count = %d , update count = %d",
-				seqSynchronizer.getQueryCount(), seqSynchronizer.getUpdateCount()));
+				seqSynchronizer.getQueryCounter(), seqSynchronizer.getUpdateCounter()));
 
 		Assert.assertTrue(lastValue == finalValue);
 	}
@@ -126,7 +135,7 @@ public abstract class SynchronizerTestCase {
 	public void multipleThreadAddTest() {
 		final SeqSynchronizer seqSynchronizer = getSeqSynchronizer();
 		final String seqName = "power4j";
-		final String partition = LocalDateTime.now().toString();
+		final String partition = StrNow();
 		final long initValue = 1L;
 		final long finalValue = 1000L;
 		final int delta = 1;
@@ -170,7 +179,7 @@ public abstract class SynchronizerTestCase {
 		System.out.println(String.format("lastValue value = %d , operate count = %d", lastValue, opCount.get()));
 
 		System.out.println(String.format("synchronizer query count = %d , update count = %d",
-				seqSynchronizer.getQueryCount(), seqSynchronizer.getUpdateCount()));
+				seqSynchronizer.getQueryCounter(), seqSynchronizer.getUpdateCounter()));
 
 		Assert.assertTrue(lastValue == finalValue + threads - 1);
 	}

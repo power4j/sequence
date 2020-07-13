@@ -17,39 +17,38 @@
 package com.power4j.kit.seq.persistent.provider;
 
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
+import io.lettuce.core.RedisClient;
 import org.junit.After;
 import org.junit.Before;
 
-/**
- * Mysql 测试
- * <p>
- *
- * @author CJ (power4j@outlook.com)
- * @date 2020/7/3
- * @since 1.0
- */
-public class MySqlSynchronizerTest extends SynchronizerTestCase {
+public class SimpleLettuceSynchronizerTest extends SynchronizerTestCase {
 
-	public final static String SEQ_TABLE = "tb_seq";
+	public final static String SEQ_CACHE_NAME = "power4j.seq";
 
-	private MySqlSynchronizer mySqlSynchronizer;
+	private RedisClient redisClient;
+
+	private SimpleLettuceSynchronizer simpleLettuceSynchronizer;
 
 	@Before
 	public void prepare() {
-		mySqlSynchronizer = new MySqlSynchronizer(SEQ_TABLE, TestServices.getMySqlDataSource());
-		mySqlSynchronizer.createMissingTable();
+		redisClient = TestServices.getRedisClient();
+		simpleLettuceSynchronizer = new SimpleLettuceSynchronizer(SEQ_CACHE_NAME, redisClient);
+		simpleLettuceSynchronizer.init();
 	}
 
 	@After
 	public void teardown() {
-		if (mySqlSynchronizer != null) {
-			mySqlSynchronizer.dropTable();
+		if (simpleLettuceSynchronizer != null) {
+			simpleLettuceSynchronizer.removeCache();
+		}
+		if (redisClient != null) {
+			redisClient.shutdown();
 		}
 	}
 
 	@Override
 	protected SeqSynchronizer getSeqSynchronizer() {
-		return mySqlSynchronizer;
+		return simpleLettuceSynchronizer;
 	}
 
 }

@@ -1,0 +1,8 @@
+server:
+  port: 8080
+
+power4j:
+  sequence:
+    # 数据同步使用的后端支持(如: mysql,oracle,redis)
+    backend: redis
+    lettuce-uri: "redis://127.0.0.1"

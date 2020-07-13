@@ -16,20 +16,26 @@
 
 package com.power4j.kit.seq;
 
-import com.power4j.kit.seq.core.LongSeqPool;
+import com.power4j.kit.seq.persistent.SeqHolder;
+import com.power4j.kit.seq.persistent.SeqSynchronizer;
+import com.power4j.kit.seq.persistent.provider.SimpleLettuceSynchronizer;
+import io.lettuce.core.RedisClient;
+import io.lettuce.core.RedisURI;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 单机序号池测试
+ * Lettuce 后端性能测试
  *
  * @author CJ (power4j@outlook.com)
- * @date 2020/7/3
- * @since 1.0
+ * @date 2020/7/12
+ * @since 1.1
  */
 @State(Scope.Benchmark)
 @Threads(Threads.MAX)
@@ -39,22 +45,32 @@ import java.util.concurrent.TimeUnit;
 @Warmup(iterations = 1, time = 3)
 @Measurement(iterations = 3, time = 10)
 @OutputTimeUnit(TimeUnit.SECONDS)
-public class LongSeqPoolBench {
+public class LettuceSeqHolderBench {
 
-	private LongSeqPool longSeqPool;
+	private static SeqSynchronizer synchronizer;
+
+	private static SeqHolder seqHolder;
 
 	@Setup
 	public void setup() {
-		longSeqPool = LongSeqPool.forSize("longSeqPool", BenchParam.SEQ_INIT_VAL, BenchParam.SEQ_POOL_SIZE, true);
+		final String partition = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+		RedisURI redisUri = RedisURI.builder().withHost("127.0.0.1").withPort(6379).build();
+		RedisClient redisClient = RedisClient.create(redisUri);
+
+		synchronizer = new SimpleLettuceSynchronizer("lettuce_ben_test", redisClient);
+		synchronizer.init();
+		seqHolder = new SeqHolder(synchronizer, "lettuce_ben_test", partition, BenchParam.SEQ_INIT_VAL,
+				BenchParam.SEQ_POOL_SIZE, null);
+		seqHolder.prepare();
 	}
 
 	@Benchmark
 	public void longSeqPoolTest() {
-		longSeqPool.next();
+		seqHolder.next();
 	}
 
 	public static void main(String[] args) throws Exception {
-		Options opt = new OptionsBuilder().include(LongSeqPoolBench.class.getSimpleName()).build();
+		Options opt = new OptionsBuilder().include(LettuceSeqHolderBench.class.getSimpleName()).build();
 		new Runner(opt).run();
 	}
 
