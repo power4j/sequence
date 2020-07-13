@@ -182,11 +182,11 @@ public class SeqHolder implements Sequence<Long> {
 		LongSeqPool seqPool;
 		String partition = partitionFunc.get();
 		if (seqSynchronizer.tryCreate(name, partition, initValue + poolSize)) {
-			seqPool = LongSeqPool.forSize(makePoolName(name, partition), initValue, poolSize, false);
+			seqPool = LongSeqPool.forRange(makePoolName(name, partition), initValue, initValue + poolSize - 1, false);
 		}
 		else {
 			AddState state = seqSynchronizer.tryAddAndGet(name, partition, poolSize, -1);
-			seqPool = LongSeqPool.forRange(makePoolName(name, partition), state.getPrevious(), state.getCurrent(),
+			seqPool = LongSeqPool.forRange(makePoolName(name, partition), state.getPrevious(), state.getCurrent() - 1,
 					false);
 		}
 		currentPartitionRef.set(partition);
