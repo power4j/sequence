@@ -34,7 +34,7 @@
 </dependency>
 ```
 
-开启配置
+开启配置(JDBC)
 ```yaml
 power4j:
   sequence:
@@ -42,7 +42,17 @@ power4j:
     backend: mysql
 ```
 
+也可以使用Redis，则配置方式为
+
+```yaml
+power4j:
+  sequence:
+    backend: redis
+    lettuce-uri: "redis://127.0.0.1"
+```
+
 使用
+
 ```java
 @RestController
 @SpringBootApplication
@@ -83,20 +93,20 @@ public class SequenceExampleApplication {
  - [ ] 支持PostgreSQL
  - [ ] 支持H2
  - [ ] 支持Oracle
- - [ ] 支持Redis
+ - [x] 支持Redis
  - [ ] 支持MongoDB
  - [X] Spring Boot 集成
- 
+
  ## 贡献指南
- 
+
  代码要求：
   - 统一风格，包含注释、代码缩进等与本项目保持一致
   - 保持代码整洁，比如注释掉的代码块等垃圾代码应该删除
   - 严格控制外部依赖，如果没有必要，请不要引入外部依赖
   - 请在类注释中保留你的作者信息
- 
+
  ### 数据库支持实现
- 
+
  1. 参考[`MySqlSynchronizer`](sequence-core/src/main/java/com/power4j/kit/seq/persistent/provider/MySqlSynchronizer.java)的实现方式，实现某个特定数据库后端的支持
  2. 参考[`MySqlSynchronizerTest`](sequence/sequence-core/src/test/java/com/power4j/kit/seq/persistent/provider/MySqlSynchronizerTest.java) 编写单元测试，完成自测。如果你的代码能跑通测试，基本上应该没有严重bug
 
