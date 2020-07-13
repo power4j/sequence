@@ -21,6 +21,11 @@
 
 - ***JDK 版本要求: `JDK8+`*** 
 
+## 核心概念
+
+- 号池(`SeqPool`): 一种设施，可以提供有限或者无限的序号。
+- 同步器(`SeqSynchronizer`): 负责与某种后端(如数据库)交互,更新序号的当前值。
+- 取号器(`SeqHolder`): 负责缓存从后端批量取出的序号，然后交给本地的号池来管理。
 
 ## 使用方法
 
@@ -75,6 +80,43 @@ public class SequenceExampleApplication {
 }
 ```
 
+## 性能测试结果
+> 测试环境用的Redis,MySQL等外部服务都是默认安装，没有调整参数。
+
+测试环境一: 腾讯云1核(2.6G)2G `CentOS7.6`
+```shell
+# Detecting actual CPU count: 1 detected
+# JMH version: 1.23
+# VM version: JDK 1.8.0_252, OpenJDK 64-Bit Server VM, 25.252-b09
+# VM invoker: /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.252.b09-2.el7_8.x86_64/jre/bin/java
+# VM options: -server -Xms32m -Xmx128m -Xmn64m -XX:CMSInitiatingOccupancyFraction=82 -Xss256k -XX:LargePageSizeInBytes=64m
+
+Benchmark                               Mode  Cnt          Score           Error  Units
+LettuceSeqHolderBench.longSeqPoolTest  thrpt    3    3564558.441 ±   1702568.310  ops/s
+LongSeqPoolBench.longSeqPoolTest       thrpt    3  176150209.446 ± 198945560.565  ops/s
+MySqlSeqHolderBench.longSeqPoolTest    thrpt    3      80548.505 ±     67809.940  ops/s
+```
+分数: 裸奔: 1.76亿, redis: 350万,MySQL:8万 
+
+测试环境二: 台式机8核(7700K,4.5G) 32G `Windows 10`
+```shell
+# Detecting actual CPU count: 8 detected
+# JMH version: 1.23
+# VM version: JDK 1.8.0_191, Java HotSpot(TM) 64-Bit Server VM, 25.191-b12
+# VM invoker: C:\app64\Java\jre1.8.0_191\bin\java.exe
+# VM options: -server -Xms32m -Xmx128m -Xmn64m -XX:CMSInitiatingOccupancyFraction=82 -Xss256k -XX:LargePageSizeInBytes=64m
+
+Benchmark                               Mode  Cnt         Score         Error  Units
+LettuceSeqHolderBench.longSeqPoolTest  thrpt    3   2866317.433 ±  746605.597  ops/s
+LongSeqPoolBench.longSeqPoolTest       thrpt    3  11794922.340 ± 1419640.822  ops/s
+MySqlSeqHolderBench.longSeqPoolTest    thrpt    3    702611.142 ±  291359.343  ops/s
+```
+分数: 裸奔: 1179万, redis: 286万,MySQL:70万 
+
+
+> - 你没有看错，4核8线程，默频4.5G的7700K被单核单线程2.6G的服务器CPU吊打。
+> - 分数看看就好,纯跑分没什么意义。
+
 ## 效果演示
 
 ### 分配10个序号
@@ -85,10 +127,6 @@ public class SequenceExampleApplication {
 
 ### Redis中的记录
 ![seq-redis](docs/assets/img/seq-redis.png)
-
-## 性能测试结果
-
-待整理 ...
 
 ## 开发计划
 
@@ -106,7 +144,7 @@ public class SequenceExampleApplication {
   - 统一风格，包含注释、代码缩进等与本项目保持一致
   - 保持代码整洁，比如注释掉的代码块等垃圾代码应该删除
   - 严格控制外部依赖，如果没有必要，请不要引入外部依赖
-  - 请在类注释中保留你的作者信息
+  - 请在类注释中保留你的作者信息，请不要害羞
 
  ### 数据库支持实现
 
