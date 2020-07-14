@@ -65,7 +65,7 @@ public class LettuceSeqHolderBench {
 	}
 
 	@Benchmark
-	public void longSeqPoolTest() {
+	public void getSeq() {
 		seqHolder.next();
 	}
 

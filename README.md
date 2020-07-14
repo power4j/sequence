@@ -26,6 +26,11 @@
 - 号池(`SeqPool`): 一种设施，可以提供有限或者无限的序号。
 - 同步器(`SeqSynchronizer`): 负责与某种后端(如数据库)交互,更新序号的当前值。
 - 取号器(`SeqHolder`): 负责缓存从后端批量取出的序号，然后交给本地的号池来管理。
+- 分区(`Partition`): 后端存储在保存序号信息时，序号的名称+分区表示一条唯一的记录,分区可以是静态的(一个字符串常量),也可以是动态分区(一个返回分区名称的函数)。分区并不是将序号的取值进行划分，主要是用于多租户等需要二次分类的场景以及避免号池耗尽。
+
+注意事项:
+- 如果使用动态分区,不宜变化过于频繁，比如用系统时间作为分区。比较合适的是按年份、月份进行分区。
+- 每一个分区的序号取值独立的，比如按年份进行分区，那么每年都有`Long.MAX`个序号可用。
 
 ## 使用方法
 
@@ -96,7 +101,7 @@ LettuceSeqHolderBench.longSeqPoolTest  thrpt    3    3564558.441 ±   1702568.31
 LongSeqPoolBench.longSeqPoolTest       thrpt    3  176150209.446 ± 198945560.565  ops/s
 MySqlSeqHolderBench.longSeqPoolTest    thrpt    3      80548.505 ±     67809.940  ops/s
 ```
-分数: 裸奔: 1.76亿, redis: 350万,MySQL:8万 
+> 分数: 裸奔: 1.76亿, redis: 350万,MySQL:8万 
 
 测试环境二: 台式机8核(7700K,4.5G) 32G `Windows 10`
 ```shell
@@ -111,11 +116,12 @@ LettuceSeqHolderBench.longSeqPoolTest  thrpt    3   2866317.433 ±  746605.597  
 LongSeqPoolBench.longSeqPoolTest       thrpt    3  11794922.340 ± 1419640.822  ops/s
 MySqlSeqHolderBench.longSeqPoolTest    thrpt    3    702611.142 ±  291359.343  ops/s
 ```
-分数: 裸奔: 1179万, redis: 286万,MySQL:70万 
+> 分数: 裸奔: 1179万, redis: 286万,MySQL:70万 
 
 
-> - 你没有看错，4核8线程，默频4.5G的7700K被单核单线程2.6G的服务器CPU吊打。
-> - 分数看看就好,纯跑分没什么意义。
+
+- 你没有看错，4核8线程，默频4.5G的7700K被单核单线程2.6G的服务器CPU吊打。
+- 分数看看就好,纯跑分没什么意义。
 
 ## 效果演示
 

@@ -68,7 +68,7 @@ public class MySqlSeqHolderBench {
 	}
 
 	@Benchmark
-	public void longSeqPoolTest() {
+	public void getSeq() {
 		seqHolder.next();
 	}
 

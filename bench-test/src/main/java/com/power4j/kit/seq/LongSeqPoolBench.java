@@ -49,7 +49,7 @@ public class LongSeqPoolBench {
 	}
 
 	@Benchmark
-	public void longSeqPoolTest() {
+	public void getSeq() {
 		longSeqPool.next();
 	}
 
