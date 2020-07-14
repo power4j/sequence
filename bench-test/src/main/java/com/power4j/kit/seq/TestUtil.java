@@ -16,17 +16,22 @@
 
 package com.power4j.kit.seq;
 
+import lombok.experimental.UtilityClass;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 /**
- * 公共参数
- *
  * @author CJ (power4j@outlook.com)
- * @date 2020/7/3
+ * @date 2020/7/14
  * @since 1.0
  */
-public interface BenchParam {
+@UtilityClass
+public class TestUtil {
 
-	long SEQ_INIT_VAL = 1L;
-
-	int SEQ_POOL_SIZE = 1000;
+	public String getPartitionName() {
+		return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss.SSS")) + "."
+				+ Thread.currentThread().getId();
+	}
 
 }

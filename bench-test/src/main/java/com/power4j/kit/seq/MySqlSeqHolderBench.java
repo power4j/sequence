@@ -26,7 +26,6 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -62,14 +61,22 @@ public class MySqlSeqHolderBench {
 		config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
 		synchronizer = new MySqlSynchronizer("seq_bench", new HikariDataSource(config));
 		synchronizer.init();
-		seqHolder = new SeqHolder(synchronizer, "bench-test", LocalDateTime.now().toString(), BenchParam.SEQ_INIT_VAL,
-				BenchParam.SEQ_POOL_SIZE, null);
+		seqHolder = new SeqHolder(synchronizer, "mysql-bench-test", TestUtil.getPartitionName(),
+				BenchParam.SEQ_INIT_VAL, BenchParam.SEQ_POOL_SIZE, null);
 		seqHolder.prepare();
 	}
 
 	@Benchmark
 	public void getSeq() {
 		seqHolder.next();
+	}
+
+	@Benchmark
+	public void getSeq1K() {
+		int size = 1000;
+		while (size-- > 0) {
+			seqHolder.next();
+		}
 	}
 
 	public static void main(String[] args) throws Exception {

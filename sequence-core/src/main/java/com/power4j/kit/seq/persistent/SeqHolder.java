@@ -65,7 +65,7 @@ public class SeqHolder implements Sequence<Long> {
 	 * 构造方法
 	 * @param seqSynchronizer 同步器
 	 * @param name 名称
-	 * @param partitionFunc 窗口函数
+	 * @param partitionFunc 分区函数
 	 * @param initValue 初始值,号池不存在时使用
 	 * @param poolSize 表示单次申请序号数量
 	 * @param seqFormatter 自定义格式化输出，可选

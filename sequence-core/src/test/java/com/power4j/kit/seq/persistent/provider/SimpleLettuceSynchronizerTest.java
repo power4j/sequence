@@ -23,7 +23,7 @@ import org.junit.Before;
 
 public class SimpleLettuceSynchronizerTest extends SynchronizerTestCase {
 
-	public final static String SEQ_CACHE_NAME = "power4j.seq";
+	public final static String SEQ_CACHE_NAME = "power4j:seq-test";
 
 	private RedisClient redisClient;
 

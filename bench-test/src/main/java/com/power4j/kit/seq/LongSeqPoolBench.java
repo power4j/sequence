@@ -45,12 +45,20 @@ public class LongSeqPoolBench {
 
 	@Setup
 	public void setup() {
-		longSeqPool = LongSeqPool.forSize("longSeqPool", BenchParam.SEQ_INIT_VAL, BenchParam.SEQ_POOL_SIZE, true);
+		longSeqPool = LongSeqPool.forRange("longSeqPool", BenchParam.SEQ_INIT_VAL, Long.MAX_VALUE, false);
 	}
 
 	@Benchmark
 	public void getSeq() {
 		longSeqPool.next();
+	}
+
+	@Benchmark
+	public void getSeq1K() {
+		int size = 1000;
+		while (size-- > 0) {
+			longSeqPool.next();
+		}
 	}
 
 	public static void main(String[] args) throws Exception {

@@ -16,13 +16,12 @@
 
 package com.power4j.kit.seq.persistent.provider;
 
+import com.power4j.kit.seq.TestUtil;
 import com.power4j.kit.seq.persistent.AddState;
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
@@ -40,10 +39,6 @@ public abstract class SynchronizerTestCase {
 
 	protected abstract SeqSynchronizer getSeqSynchronizer();
 
-	protected String StrNow() {
-		return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-	}
-
 	/**
 	 * 一般使用步骤测试
 	 */
@@ -51,7 +46,7 @@ public abstract class SynchronizerTestCase {
 	public void simpleTest() {
 		final SeqSynchronizer seqSynchronizer = getSeqSynchronizer();
 		final String seqName = "power4j";
-		final String partition = StrNow();
+		final String partition = TestUtil.StrNow();
 		final long initValue = 1000L;
 		final long newValue = 1L;
 		seqSynchronizer.tryCreate(seqName, partition, initValue);
@@ -79,7 +74,7 @@ public abstract class SynchronizerTestCase {
 	public void multipleThreadUpdateTest() {
 		final SeqSynchronizer seqSynchronizer = getSeqSynchronizer();
 		final String seqName = "power4j";
-		final String partition = StrNow();
+		final String partition = TestUtil.StrNow();
 		final long initValue = 1L;
 		final long finalValue = 1000L;
 		final int delta = 1;
@@ -92,7 +87,7 @@ public abstract class SynchronizerTestCase {
 		for (int t = 0; t < threads; ++t) {
 			CompletableFuture.runAsync(() -> {
 				threadReady.countDown();
-				wait(threadReady);
+				TestUtil.wait(threadReady);
 				seqSynchronizer.tryCreate(seqName, partition, initValue);
 				long current;
 				int loop = 0;
@@ -118,7 +113,7 @@ public abstract class SynchronizerTestCase {
 				return null;
 			});
 		}
-		wait(threadDone);
+		TestUtil.wait(threadDone);
 		long lastValue = seqSynchronizer.getNextValue(seqName, partition).get();
 		System.out.println(String.format("lastValue value = %d , update count = %d", lastValue, updateCount.get()));
 
@@ -135,7 +130,7 @@ public abstract class SynchronizerTestCase {
 	public void multipleThreadAddTest() {
 		final SeqSynchronizer seqSynchronizer = getSeqSynchronizer();
 		final String seqName = "power4j";
-		final String partition = StrNow();
+		final String partition = TestUtil.StrNow();
 		final long initValue = 1L;
 		final long finalValue = 1000L;
 		final int delta = 1;
@@ -148,7 +143,7 @@ public abstract class SynchronizerTestCase {
 		for (int t = 0; t < threads; ++t) {
 			CompletableFuture.runAsync(() -> {
 				threadReady.countDown();
-				wait(threadReady);
+				TestUtil.wait(threadReady);
 				seqSynchronizer.tryCreate(seqName, partition, initValue);
 				int loop = 0;
 				AddState addState;
@@ -174,7 +169,7 @@ public abstract class SynchronizerTestCase {
 			});
 		}
 
-		wait(threadDone);
+		TestUtil.wait(threadDone);
 		long lastValue = seqSynchronizer.getNextValue(seqName, partition).get();
 		System.out.println(String.format("lastValue value = %d , operate count = %d", lastValue, opCount.get()));
 
@@ -182,15 +177,6 @@ public abstract class SynchronizerTestCase {
 				seqSynchronizer.getQueryCounter(), seqSynchronizer.getUpdateCounter()));
 
 		Assert.assertTrue(lastValue == finalValue + threads - 1);
-	}
-
-	public static void wait(CountDownLatch countDownLatch) {
-		try {
-			countDownLatch.await();
-		}
-		catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-		}
 	}
 
 }

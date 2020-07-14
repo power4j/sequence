@@ -26,8 +26,6 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -53,7 +51,7 @@ public class LettuceSeqHolderBench {
 
 	@Setup
 	public void setup() {
-		final String partition = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+		final String partition = TestUtil.getPartitionName();
 		RedisURI redisUri = RedisURI.builder().withHost("127.0.0.1").withPort(6379).build();
 		RedisClient redisClient = RedisClient.create(redisUri);
 
@@ -67,6 +65,14 @@ public class LettuceSeqHolderBench {
 	@Benchmark
 	public void getSeq() {
 		seqHolder.next();
+	}
+
+	@Benchmark
+	public void getSeq1K() {
+		int size = 1000;
+		while (size-- > 0) {
+			seqHolder.next();
+		}
 	}
 
 	public static void main(String[] args) throws Exception {
