@@ -16,10 +16,12 @@
 
 package com.power4j.kit.seq.persistent.provider;
 
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.power4j.kit.seq.utils.EnvUtil;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.lettuce.core.RedisClient;
-import io.lettuce.core.RedisURI;
 
 import javax.sql.DataSource;
 
@@ -30,15 +32,27 @@ import javax.sql.DataSource;
  */
 public class TestServices {
 
-	public final static String MYSQL_JDBC_URL_TEMPLATE = "jdbc:mysql://%s:%s/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false";
+	/**
+	 * protocol//[hosts][/database][?properties]
+	 */
+	private final static String DEFAULT_MYSQL_JDBC_URL = "jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false";
+
+	/**
+	 * redis://[password@]host [: port][/database]
+	 */
+	public final static String DEFAULT_REDIS_URI = "redis://127.0.0.1:6379";
+
+	/**
+	 * mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database.collection][?options]]
+	 */
+	public final static String DEFAULT_MONGO_URI = "mongodb://127.0.0.1:27017";
 
 	public static DataSource getMySqlDataSource() {
-		String jdbcUrl = String.format(MYSQL_JDBC_URL_TEMPLATE, getEnvOrDefault("TEST_MYSQL_HOST", "127.0.0.1"),
-				getEnvOrDefault("TEST_MYSQL_PORT", "3306"));
+		String jdbcUrl = EnvUtil.getStr("TEST_MYSQL_URL", DEFAULT_MYSQL_JDBC_URL);
 		HikariConfig config = new HikariConfig();
 		config.setJdbcUrl(jdbcUrl);
-		config.setUsername(getEnvOrDefault("TEST_MYSQL_USER", "root"));
-		config.setPassword(getEnvOrDefault("TEST_MYSQL_PWD", ""));
+		config.setUsername(EnvUtil.getStr("TEST_MYSQL_USER", "root"));
+		config.setPassword(EnvUtil.getStr("TEST_MYSQL_PWD", ""));
 		config.addDataSourceProperty("cachePrepStmts", "true");
 		config.addDataSourceProperty("prepStmtCacheSize", "100");
 		config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
@@ -46,29 +60,17 @@ public class TestServices {
 	}
 
 	public static RedisClient getRedisClient() {
-		RedisURI redisUri = RedisURI.builder().withHost(getEnvOrDefault("TEST_REDIS_HOST", "127.0.0.1"))
-				.withPort(getEnvOrDefault("TEST_REDIS_PORT", 6379)).build();
+		String redisUri = EnvUtil.getStr("TEST_REDIS_URI", DEFAULT_REDIS_URI);
 		RedisClient redisClient = RedisClient.create(redisUri);
 
 		return redisClient;
 	}
 
-	public static String getEnvOrDefault(String envKey, String defValue) {
-		String val = System.getenv(envKey);
-		return val != null ? val : defValue;
-	}
+	public static MongoClient getMongoClient() {
+		String mongoUri = EnvUtil.getStr("TEST_MONGO_URI", DEFAULT_MONGO_URI);
+		MongoClient mongoClient = MongoClients.create(mongoUri);
 
-	public static Integer getEnvOrDefault(String envKey, Integer defValue) {
-		String val = System.getenv(envKey);
-		if (val == null) {
-			return defValue;
-		}
-		try {
-			return Integer.parseInt(val);
-		}
-		catch (NumberFormatException e) {
-			return defValue;
-		}
+		return mongoClient;
 	}
 
 }

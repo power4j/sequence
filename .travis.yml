@@ -38,4 +38,5 @@ before_install:
 
 services:
   - mysql
+  - mongodb
   - redis-server

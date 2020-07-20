@@ -23,6 +23,7 @@ import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
 import io.lettuce.core.cluster.RedisClusterClient;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -34,6 +35,7 @@ import org.springframework.context.annotation.Configuration;
  * @since 1.0
  */
 @Configuration
+@ConditionalOnClass({ RedisClient.class, RedisClusterClient.class })
 public class RedisSynchronizerConfigure {
 
 	@Bean(destroyMethod = "shutdown")

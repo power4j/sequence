@@ -175,9 +175,4 @@ public abstract class AbstractJdbcSynchronizer implements SeqSynchronizer {
 		}
 	}
 
-	@Override
-	public void shutdown() {
-		// do nothing
-	}
-
 }

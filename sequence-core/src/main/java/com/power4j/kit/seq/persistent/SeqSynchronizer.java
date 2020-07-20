@@ -88,7 +88,9 @@ public interface SeqSynchronizer {
 	 * </p>
 	 * 。
 	 */
-	void shutdown();
+	default void shutdown() {
+		// do nothing
+	}
 
 	/**
 	 * 查询语句总共执行的次数

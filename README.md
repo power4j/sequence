@@ -96,31 +96,15 @@ public class SequenceExampleApplication {
 # VM invoker: /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.252.b09-2.el7_8.x86_64/jre/bin/java
 # VM options: -server -Xms32m -Xmx128m -Xmn64m -XX:CMSInitiatingOccupancyFraction=82 -Xss256k -XX:LargePageSizeInBytes=64m
 
-Benchmark                               Mode  Cnt          Score           Error  Units
-LettuceSeqHolderBench.longSeqPoolTest  thrpt    3    3564558.441 ±   1702568.310  ops/s
-LongSeqPoolBench.longSeqPoolTest       thrpt    3  176150209.446 ± 198945560.565  ops/s
-MySqlSeqHolderBench.longSeqPoolTest    thrpt    3      80548.505 ±     67809.940  ops/s
+Benchmark                      Mode  Cnt         Score          Error  Units
+LettuceSeqHolderBench.getSeq  thrpt    3   3682420.572 ±  1058146.431  ops/s
+LongSeqPoolBench.getSeq       thrpt    3  75273390.592 ± 72699905.480  ops/s
+MongoSeqHolderBench.getSeq    thrpt    3   1305400.597 ±  8767008.399  ops/s
+MySqlSeqHolderBench.getSeq    thrpt    3     90594.876 ±    67488.430  ops/s
+
 ```
-> 分数: 裸奔: 1.76亿, redis: 350万,MySQL:8万 
+> 分数: 裸奔: 7500万, redis: 360万,MySQL:9万,MongoDB 130万 
 
-测试环境二: 台式机8核(7700K,4.5G) 32G `Windows 10`
-```shell
-# Detecting actual CPU count: 8 detected
-# JMH version: 1.23
-# VM version: JDK 1.8.0_191, Java HotSpot(TM) 64-Bit Server VM, 25.191-b12
-# VM invoker: C:\app64\Java\jre1.8.0_191\bin\java.exe
-# VM options: -server -Xms32m -Xmx128m -Xmn64m -XX:CMSInitiatingOccupancyFraction=82 -Xss256k -XX:LargePageSizeInBytes=64m
-
-Benchmark                               Mode  Cnt         Score         Error  Units
-LettuceSeqHolderBench.longSeqPoolTest  thrpt    3   2866317.433 ±  746605.597  ops/s
-LongSeqPoolBench.longSeqPoolTest       thrpt    3  11794922.340 ± 1419640.822  ops/s
-MySqlSeqHolderBench.longSeqPoolTest    thrpt    3    702611.142 ±  291359.343  ops/s
-```
-> 分数: 裸奔: 1179万, redis: 286万,MySQL:70万 
-
-
-
-- 你没有看错，4核8线程，默频4.5G的7700K被单核单线程2.6G的服务器CPU吊打。
 - 分数看看就好,纯跑分没什么意义。
 
 ## 效果演示
@@ -141,7 +125,7 @@ MySqlSeqHolderBench.longSeqPoolTest    thrpt    3    702611.142 ±  291359.343  
  - [ ] 支持H2
  - [ ] 支持Oracle
  - [x] 支持Redis
- - [ ] 支持MongoDB
+ - [x] 支持MongoDB
  - [X] Spring Boot 集成
 
  ## 贡献指南

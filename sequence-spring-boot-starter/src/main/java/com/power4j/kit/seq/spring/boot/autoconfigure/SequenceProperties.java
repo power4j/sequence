@@ -56,7 +56,7 @@ public class SequenceProperties {
 	private int fetchSize = 100;
 
 	/**
-	 * 名称
+	 * 序号名称
 	 */
 	private String name = "seq";
 
@@ -71,6 +71,11 @@ public class SequenceProperties {
 	 */
 	private String lettuceUri = "redis://localhost";
 
+	/**
+	 * MongoDB URI <a>https://docs.mongodb.com/manual/reference/connection-string/</a>
+	 */
+	private String mongoUri = "mongodb://localhost";
+
 	public enum BackendTypeEnum {
 
 		/**
@@ -84,7 +89,11 @@ public class SequenceProperties {
 		/**
 		 * Redis Cluster
 		 */
-		redisCluster
+		redisCluster,
+		/**
+		 * MongoDB
+		 */
+		mongo
 
 	}
 

@@ -19,9 +19,10 @@ package com.power4j.kit.seq;
 import com.power4j.kit.seq.persistent.SeqHolder;
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
 import com.power4j.kit.seq.persistent.provider.SimpleLettuceSynchronizer;
+import com.power4j.kit.seq.utils.EnvUtil;
 import io.lettuce.core.RedisClient;
-import io.lettuce.core.RedisURI;
 import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
@@ -45,15 +46,21 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.SECONDS)
 public class LettuceSeqHolderBench {
 
+	/**
+	 * redis://[password@]host [: port][/database]
+	 */
+	private final static String REDIS_URI = EnvUtil.getStr("TEST_REDIS_URI", "redis://127.0.0.1:6379");
+
 	private static SeqSynchronizer synchronizer;
 
 	private static SeqHolder seqHolder;
 
+	private long val;
+
 	@Setup
 	public void setup() {
 		final String partition = TestUtil.getPartitionName();
-		RedisURI redisUri = RedisURI.builder().withHost("127.0.0.1").withPort(6379).build();
-		RedisClient redisClient = RedisClient.create(redisUri);
+		RedisClient redisClient = RedisClient.create(REDIS_URI);
 
 		synchronizer = new SimpleLettuceSynchronizer("lettuce_ben_test", redisClient);
 		synchronizer.init();
@@ -63,16 +70,8 @@ public class LettuceSeqHolderBench {
 	}
 
 	@Benchmark
-	public void getSeq() {
-		seqHolder.next();
-	}
-
-	@Benchmark
-	public void getSeq1K() {
-		int size = 1000;
-		while (size-- > 0) {
-			seqHolder.next();
-		}
+	public void getSeq(Blackhole bh) {
+		bh.consume(seqHolder.next());
 	}
 
 	public static void main(String[] args) throws Exception {

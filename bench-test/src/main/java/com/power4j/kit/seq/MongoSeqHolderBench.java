@@ -16,7 +16,12 @@
 
 package com.power4j.kit.seq;
 
-import com.power4j.kit.seq.core.LongSeqPool;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.power4j.kit.seq.persistent.SeqHolder;
+import com.power4j.kit.seq.persistent.SeqSynchronizer;
+import com.power4j.kit.seq.persistent.provider.SimpleMongoSynchronizer;
+import com.power4j.kit.seq.utils.EnvUtil;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.runner.Runner;
@@ -26,10 +31,8 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 单机序号池测试
- *
  * @author CJ (power4j@outlook.com)
- * @date 2020/7/3
+ * @date 2020/7/20
  * @since 1.0
  */
 @State(Scope.Benchmark)
@@ -40,22 +43,34 @@ import java.util.concurrent.TimeUnit;
 @Warmup(iterations = 1, time = 3)
 @Measurement(iterations = 3, time = 10)
 @OutputTimeUnit(TimeUnit.SECONDS)
-public class LongSeqPoolBench {
+public class MongoSeqHolderBench {
 
-	private LongSeqPool longSeqPool;
+	/**
+	 * mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database.collection][?options]]
+	 */
+	private final static String MONGO_URI = EnvUtil.getStr("TEST_MONGO_URI", "mongodb://127.0.0.1:27017");
+
+	private static SeqSynchronizer synchronizer;
+
+	private static SeqHolder seqHolder;
 
 	@Setup
 	public void setup() {
-		longSeqPool = LongSeqPool.forRange("longSeqPool", BenchParam.SEQ_INIT_VAL, Long.MAX_VALUE, false);
+		MongoClient mongoClient = MongoClients.create(MONGO_URI);
+		synchronizer = new SimpleMongoSynchronizer("seq_bench", "seq_col", mongoClient);
+		synchronizer.init();
+		seqHolder = new SeqHolder(synchronizer, "mongo-bench-test", TestUtil.getPartitionName(),
+				BenchParam.SEQ_INIT_VAL, BenchParam.SEQ_POOL_SIZE, null);
+		seqHolder.prepare();
 	}
 
 	@Benchmark
 	public void getSeq(Blackhole bh) {
-		bh.consume(longSeqPool.next());
+		bh.consume(seqHolder.next());
 	}
 
 	public static void main(String[] args) throws Exception {
-		Options opt = new OptionsBuilder().include(LongSeqPoolBench.class.getSimpleName()).build();
+		Options opt = new OptionsBuilder().include(MongoSeqHolderBench.class.getSimpleName()).build();
 		new Runner(opt).run();
 	}
 

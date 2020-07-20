@@ -16,40 +16,41 @@
 
 package com.power4j.kit.seq.persistent.provider;
 
+import com.mongodb.client.MongoClient;
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
 import org.junit.After;
 import org.junit.Before;
 
-/**
- * Mysql 测试
- * <p>
- *
- * @author CJ (power4j@outlook.com)
- * @date 2020/7/3
- * @since 1.0
- */
-public class MySqlSynchronizerTest extends SynchronizerTestCase {
+public class SimpleMongoSynchronizerTest extends SynchronizerTestCase {
 
-	public final static String SEQ_TABLE = "tb_seq";
+	public final static String DB_NAME = "test";
 
-	private MySqlSynchronizer mySqlSynchronizer;
+	public final static String COLL_NAME = "col_seq";
+
+	private MongoClient mongoClient;
+
+	private SimpleMongoSynchronizer simpleMongoSynchronizer;
 
 	@Before
 	public void prepare() {
-		mySqlSynchronizer = new MySqlSynchronizer(SEQ_TABLE, TestServices.getMySqlDataSource());
-		mySqlSynchronizer.init();
+		mongoClient = TestServices.getMongoClient();
+		simpleMongoSynchronizer = new SimpleMongoSynchronizer(DB_NAME, COLL_NAME, mongoClient);
+		simpleMongoSynchronizer.init();
 	}
 
 	@After
 	public void teardown() {
-		if (mySqlSynchronizer != null) {
-			mySqlSynchronizer.dropTable();
+		if (simpleMongoSynchronizer != null) {
+			simpleMongoSynchronizer.dropCollection();
+		}
+		if (mongoClient != null) {
+			mongoClient.close();
 		}
 	}
 
 	@Override
 	protected SeqSynchronizer getSeqSynchronizer() {
-		return mySqlSynchronizer;
+		return simpleMongoSynchronizer;
 	}
 
 }

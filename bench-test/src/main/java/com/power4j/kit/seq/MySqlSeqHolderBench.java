@@ -19,9 +19,11 @@ package com.power4j.kit.seq;
 import com.power4j.kit.seq.persistent.SeqHolder;
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
 import com.power4j.kit.seq.persistent.provider.MySqlSynchronizer;
+import com.power4j.kit.seq.utils.EnvUtil;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
@@ -45,17 +47,20 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.SECONDS)
 public class MySqlSeqHolderBench {
 
+	private final static String DEFAULT_MYSQL_JDBC_URL = "jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false";
+
+	private final static String JDBC_URL = EnvUtil.getStr("TEST_MYSQL_URL", DEFAULT_MYSQL_JDBC_URL);
+
 	private static SeqSynchronizer synchronizer;
 
 	private static SeqHolder seqHolder;
 
 	@Setup
 	public void setup() {
-		String MYSQL_JDBC_URL = "jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false";
 		HikariConfig config = new HikariConfig();
-		config.setJdbcUrl(MYSQL_JDBC_URL);
-		config.setUsername("root");
-		config.setPassword("root");
+		config.setJdbcUrl(JDBC_URL);
+		config.setUsername(EnvUtil.getStr("MYSQL_USER", "root"));
+		config.setPassword(EnvUtil.getStr("MYSQL_PWD", "root"));
 		config.addDataSourceProperty("cachePrepStmts", "true");
 		config.addDataSourceProperty("prepStmtCacheSize", "100");
 		config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
@@ -67,16 +72,8 @@ public class MySqlSeqHolderBench {
 	}
 
 	@Benchmark
-	public void getSeq() {
-		seqHolder.next();
-	}
-
-	@Benchmark
-	public void getSeq1K() {
-		int size = 1000;
-		while (size-- > 0) {
-			seqHolder.next();
-		}
+	public void getSeq(Blackhole bh) {
+		bh.consume(seqHolder.next());
 	}
 
 	public static void main(String[] args) throws Exception {

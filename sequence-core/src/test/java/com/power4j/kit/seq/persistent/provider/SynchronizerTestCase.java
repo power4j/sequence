@@ -92,7 +92,7 @@ public abstract class SynchronizerTestCase {
 				long current;
 				int loop = 0;
 				while ((current = seqSynchronizer.getNextValue(seqName, partition).get()) != finalValue) {
-					if (loop % 100 == 0) {
+					if (loop % 1000 == 0) {
 						System.out.println(String.format("[thread %s] loop %08d, current = %08d",
 								Thread.currentThread().getName(), loop, current));
 					}
@@ -132,7 +132,7 @@ public abstract class SynchronizerTestCase {
 		final String seqName = "power4j";
 		final String partition = TestUtil.StrNow();
 		final long initValue = 1L;
-		final long finalValue = 1000L;
+		final long finalValue = 10000L;
 		final int delta = 1;
 		final int threads = 8;
 		CountDownLatch threadReady = new CountDownLatch(threads);
@@ -150,7 +150,7 @@ public abstract class SynchronizerTestCase {
 				do {
 					addState = seqSynchronizer.tryAddAndGet(seqName, partition, delta, 3);
 					opCount.addAndGet(addState.getTotalOps());
-					if (loop % 20 == 0) {
+					if (loop % 200 == 0) {
 						System.out.println(String.format("[thread %s] loop %08d, from %08d to %08d",
 								Thread.currentThread().getName(), loop, addState.getPrevious(), addState.getCurrent()));
 						Assert.assertTrue(

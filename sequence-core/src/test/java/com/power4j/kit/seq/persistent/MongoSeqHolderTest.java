@@ -16,32 +16,39 @@
 
 package com.power4j.kit.seq.persistent;
 
+import com.mongodb.client.MongoClient;
 import com.power4j.kit.seq.TestUtil;
 import com.power4j.kit.seq.core.SeqFormatter;
-import com.power4j.kit.seq.persistent.provider.SimpleLettuceSynchronizer;
+import com.power4j.kit.seq.persistent.provider.SimpleMongoSynchronizer;
 import com.power4j.kit.seq.persistent.provider.TestServices;
-import io.lettuce.core.RedisClient;
 import org.junit.After;
 import org.junit.Before;
 
-public class LettuceSeqHolderTest extends SeqHolderTestCase {
+/**
+ * @author CJ (power4j@outlook.com)
+ * @date 2020/7/20
+ * @since 1.0
+ */
+public class MongoSeqHolderTest extends SeqHolderTestCase {
 
-	public final static String SEQ_CACHE_NAME = "power4j:" + LettuceSeqHolderTest.class.getSimpleName();
+	public final static String DB_NAME = "seq_test";
 
-	public final String seqName = "seq_holder_test";
+	public final static String COL_NAME = "holder_test";
+
+	public final String seqName = "power4j_" + MongoSeqHolderTest.class.getSimpleName();
 
 	public final String partition = TestUtil.StrNow();
 
-	private RedisClient redisClient;
+	private MongoClient mongoClient;
 
-	private SimpleLettuceSynchronizer seqSynchronizer;
+	private SimpleMongoSynchronizer seqSynchronizer;
 
 	private SeqHolder holder;
 
 	@Before
 	public void prepare() {
-		redisClient = TestServices.getRedisClient();
-		seqSynchronizer = new SimpleLettuceSynchronizer(SEQ_CACHE_NAME, redisClient);
+		mongoClient = TestServices.getMongoClient();
+		seqSynchronizer = new SimpleMongoSynchronizer(DB_NAME, COL_NAME, mongoClient);
 		seqSynchronizer.init();
 		holder = new SeqHolder(seqSynchronizer, seqName, partition, 1L, 1000, SeqFormatter.DEFAULT_FORMAT);
 		holder.prepare();
@@ -49,8 +56,8 @@ public class LettuceSeqHolderTest extends SeqHolderTestCase {
 
 	@After
 	public void teardown() {
-		if (redisClient != null) {
-			redisClient.shutdown();
+		if (mongoClient != null) {
+			mongoClient.close();
 		}
 	}
 
