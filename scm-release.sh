@@ -1,11 +1,10 @@
 #!/bin/bash
 
-export TEST_MYSQL_HOST=10.11.12.7
-export TEST_MYSQL_PORT=3306
+export TEST_MYSQL_URL="jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false"
 export TEST_MYSQL_USER=root
 export TEST_MYSQL_PWD=root
-export TEST_REDIS_HOST=10.11.12.7
-export TEST_REDIS_PORT=6379
+export TEST_REDIS_URI="redis://127.0.0.1:6379"
+export TEST_MONGO_URI="mongodb://root:root@127.0.0.1:27017"
 
 mvn release:clean -P 'oss-release,aliyun-repo' && \
 mvn release:prepare -P 'oss-release,aliyun-repo' && \
