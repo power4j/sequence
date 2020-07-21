@@ -26,12 +26,24 @@ package com.power4j.kit.seq.core;
 @FunctionalInterface
 public interface SeqFormatter {
 
+	/**
+	 * 默认格式: 分区+序号值
+	 */
 	SeqFormatter DEFAULT_FORMAT = (seqName, partition, value) -> String.format("%s%08d", partition, value);
 
+	/**
+	 * 适用于按年分区
+	 */
 	SeqFormatter ANNUALLY_FORMAT = (seqName, partition, value) -> String.format("%s%10d", partition, value);
 
+	/**
+	 * 适用于按月分区
+	 */
 	SeqFormatter MONTHLY_FORMAT = (seqName, partition, value) -> String.format("%s%08d", partition, value);
 
+	/**
+	 * 适用于按日分区
+	 */
 	SeqFormatter DAILY_FORMAT = (seqName, partition, value) -> String.format("%s%06d", partition, value);
 
 	/**

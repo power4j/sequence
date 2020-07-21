@@ -55,8 +55,6 @@ public class LettuceSeqHolderBench {
 
 	private static SeqHolder seqHolder;
 
-	private long val;
-
 	@Setup
 	public void setup() {
 		final String partition = TestUtil.getPartitionName();
