@@ -16,6 +16,7 @@
 
 package com.power4j.kit.seq.core;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
 import java.util.*;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
+@Slf4j
 public class LongSeqPoolTest {
 
 	private final String poolName = "test-seq-pool";
@@ -78,8 +80,8 @@ public class LongSeqPoolTest {
 		for (int i = 0; i < size; ++i) {
 			long val = pool.take();
 			int taken = i + 1;
-			System.out.println(String.format("#[%04d] get = %d, peek next = %d, remaining = %d", taken, val,
-					pool.peek(), pool.remaining()));
+			log.info(String.format("#[%04d] get = %d, peek next = %d, remaining = %d", taken, val, pool.peek(),
+					pool.remaining()));
 			assertEquals(pool.capacity(), size);
 			assertEquals(pool.remaining(), size - taken);
 			assertEquals(val, start + i);
@@ -96,8 +98,8 @@ public class LongSeqPoolTest {
 			for (int i = 0; i < size; ++i) {
 				long val = pool.take();
 				int taken = i + 1;
-				System.out.println(String.format("#[%04d] get = %d, peek next = %d, remaining = %d", taken, val,
-						pool.peek(), pool.remaining()));
+				log.info(String.format("#[%04d] get = %d, peek next = %d, remaining = %d", taken, val, pool.peek(),
+						pool.remaining()));
 				assertEquals(pool.capacity(), size);
 				assertEquals(pool.remaining(), size);
 				assertEquals(val, start + i);
@@ -181,7 +183,7 @@ public class LongSeqPoolTest {
 		threadResults.entrySet().forEach(kv -> {
 			Set<Long> distinct = kv.getValue().stream().collect(Collectors.toSet());
 			// 采样数量一样，但是消费能力不一样，因此去重后数量有所不同
-			System.out.println(String.format("thread[%s] size = %d,distinct = %d", kv.getKey(), kv.getValue().size(),
+			log.info(String.format("thread[%s] size = %d,distinct = %d", kv.getKey(), kv.getValue().size(),
 					distinct.size()));
 		});
 

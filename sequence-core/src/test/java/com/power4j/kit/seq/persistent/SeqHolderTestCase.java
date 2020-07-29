@@ -17,6 +17,7 @@
 package com.power4j.kit.seq.persistent;
 
 import com.power4j.kit.seq.TestUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -35,6 +36,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @date 2020/7/14
  * @since 1.0
  */
+@Slf4j
 public abstract class SeqHolderTestCase {
 
 	protected abstract SeqHolder getSeqHolder();
@@ -48,7 +50,7 @@ public abstract class SeqHolderTestCase {
 		CountDownLatch threadDone = new CountDownLatch(threads);
 		AtomicLong opCount = new AtomicLong();
 		ExecutorService executorService = Executors.newFixedThreadPool(threads);
-		System.out.println(String.format("start test loops = %d threads = %d", loops, threads));
+		log.info(String.format("start test loops = %d threads = %d", loops, threads));
 		Instant startTime = Instant.now();
 		for (int t = 0; t < threads; ++t) {
 			CompletableFuture.runAsync(() -> {
@@ -58,8 +60,8 @@ public abstract class SeqHolderTestCase {
 
 				for (int i = 0; i < loops; ++i) {
 					if (i % 5000 == 0) {
-						System.out.println(String.format("[thread %s] test running [%d / %d]",
-								Thread.currentThread().getName(), i, loops));
+						log.info(String.format("[thread %s] test running [%d / %d]", Thread.currentThread().getName(),
+								i, loops));
 					}
 					long val = holder.next();
 					dataSet.add(val);
@@ -68,8 +70,8 @@ public abstract class SeqHolderTestCase {
 				dataSet.clear();
 				opCount.addAndGet(size);
 				threadDone.countDown();
-				System.out.println(String.format("[thread %s] [done] dataset size = %08d",
-						Thread.currentThread().getName(), size));
+				log.info(String.format("[thread %s] [done] dataset size = %08d", Thread.currentThread().getName(),
+						size));
 				Assert.assertEquals(size, loops);
 			}, executorService).exceptionally(e -> {
 				threadDone.countDown();
@@ -80,7 +82,7 @@ public abstract class SeqHolderTestCase {
 
 		TestUtil.wait(threadDone);
 		long timeCost = Duration.between(startTime, Instant.now()).toMillis();
-		System.out.println(String.format("test end,opCount = %d,time cost = %d ms", opCount.get(), timeCost));
+		log.info(String.format("test end,opCount = %d,time cost = %d ms", opCount.get(), timeCost));
 		Assert.assertEquals(opCount.get(), loops * threads);
 	}
 
