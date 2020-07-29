@@ -34,14 +34,14 @@ public class PostgreSqlSeqHolderTest extends SeqHolderTestCase {
 
 	public final String seqName = "power4j_" + PostgreSqlSeqHolderTest.class.getSimpleName();
 
-	public final String partition = TestUtil.StrNow();
+	public final String partition = TestUtil.strNow();
 
 	private PostgreSqlSynchronizer seqSynchronizer;
 
 	private SeqHolder holder;
 
 	@Before
-	public void prepare() {
+	public void setUp() {
 		seqSynchronizer = new PostgreSqlSynchronizer(SEQ_TABLE, TestServices.getPostgreSqlDataSource());
 		seqSynchronizer.init();
 		holder = new SeqHolder(seqSynchronizer, seqName, partition, 1L, 1000, SeqFormatter.DEFAULT_FORMAT);
@@ -49,7 +49,7 @@ public class PostgreSqlSeqHolderTest extends SeqHolderTestCase {
 	}
 
 	@After
-	public void teardown() {
+	public void tearDown() {
 		seqSynchronizer.dropTable();
 	}
 

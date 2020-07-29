@@ -29,14 +29,14 @@ public class MySqlSeqHolderTest extends SeqHolderTestCase {
 
 	public final String seqName = "power4j_" + MySqlSeqHolderTest.class.getSimpleName();
 
-	public final String partition = TestUtil.StrNow();
+	public final String partition = TestUtil.strNow();
 
 	private MySqlSynchronizer seqSynchronizer;
 
 	private SeqHolder holder;
 
 	@Before
-	public void prepare() {
+	public void setUp() {
 		seqSynchronizer = new MySqlSynchronizer(SEQ_TABLE, TestServices.getMySqlDataSource());
 		seqSynchronizer.init();
 		holder = new SeqHolder(seqSynchronizer, seqName, partition, 1L, 1000, SeqFormatter.DEFAULT_FORMAT);
@@ -44,7 +44,7 @@ public class MySqlSeqHolderTest extends SeqHolderTestCase {
 	}
 
 	@After
-	public void teardown() {
+	public void tearDown() {
 		seqSynchronizer.dropTable();
 	}
 

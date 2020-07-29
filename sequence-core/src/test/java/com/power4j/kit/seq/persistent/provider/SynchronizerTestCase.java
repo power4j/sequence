@@ -46,7 +46,7 @@ public abstract class SynchronizerTestCase {
 	public void simpleTest() {
 		final SeqSynchronizer seqSynchronizer = getSeqSynchronizer();
 		final String seqName = "power4j";
-		final String partition = TestUtil.StrNow();
+		final String partition = TestUtil.strNow();
 		final long initValue = 1000L;
 		final long newValue = 1L;
 		seqSynchronizer.tryCreate(seqName, partition, initValue);
@@ -74,7 +74,7 @@ public abstract class SynchronizerTestCase {
 	public void multipleThreadUpdateTest() {
 		final SeqSynchronizer seqSynchronizer = getSeqSynchronizer();
 		final String seqName = "power4j";
-		final String partition = TestUtil.StrNow();
+		final String partition = TestUtil.strNow();
 		final long initValue = 1L;
 		final long finalValue = 1000L;
 		final int delta = 1;
@@ -130,7 +130,7 @@ public abstract class SynchronizerTestCase {
 	public void multipleThreadAddTest() {
 		final SeqSynchronizer seqSynchronizer = getSeqSynchronizer();
 		final String seqName = "power4j";
-		final String partition = TestUtil.StrNow();
+		final String partition = TestUtil.strNow();
 		final long initValue = 1L;
 		final long finalValue = 10000L;
 		final int delta = 1;

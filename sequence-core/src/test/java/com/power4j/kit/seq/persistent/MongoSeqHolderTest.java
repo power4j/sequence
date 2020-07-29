@@ -37,7 +37,7 @@ public class MongoSeqHolderTest extends SeqHolderTestCase {
 
 	public final String seqName = "power4j_" + MongoSeqHolderTest.class.getSimpleName();
 
-	public final String partition = TestUtil.StrNow();
+	public final String partition = TestUtil.strNow();
 
 	private MongoClient mongoClient;
 
@@ -46,7 +46,7 @@ public class MongoSeqHolderTest extends SeqHolderTestCase {
 	private SeqHolder holder;
 
 	@Before
-	public void prepare() {
+	public void setUp() {
 		mongoClient = TestServices.getMongoClient();
 		seqSynchronizer = new SimpleMongoSynchronizer(DB_NAME, COL_NAME, mongoClient);
 		seqSynchronizer.init();
@@ -55,7 +55,7 @@ public class MongoSeqHolderTest extends SeqHolderTestCase {
 	}
 
 	@After
-	public void teardown() {
+	public void tearDown() {
 		if (mongoClient != null) {
 			mongoClient.close();
 		}

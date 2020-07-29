@@ -30,7 +30,7 @@ public class LettuceSeqHolderTest extends SeqHolderTestCase {
 
 	public final String seqName = "seq_holder_test";
 
-	public final String partition = TestUtil.StrNow();
+	public final String partition = TestUtil.strNow();
 
 	private RedisClient redisClient;
 
@@ -39,7 +39,7 @@ public class LettuceSeqHolderTest extends SeqHolderTestCase {
 	private SeqHolder holder;
 
 	@Before
-	public void prepare() {
+	public void setUp() {
 		redisClient = TestServices.getRedisClient();
 		seqSynchronizer = new SimpleLettuceSynchronizer(SEQ_CACHE_NAME, redisClient);
 		seqSynchronizer.init();
@@ -48,7 +48,7 @@ public class LettuceSeqHolderTest extends SeqHolderTestCase {
 	}
 
 	@After
-	public void teardown() {
+	public void tearDown() {
 		if (redisClient != null) {
 			redisClient.shutdown();
 		}
