@@ -107,7 +107,7 @@ public abstract class AbstractLettuceSynchronizer implements SeqSynchronizer {
 			ScanArgs scanArgs = ScanArgs.Builder.limit(10).match(cacheName + RedisConstants.KEY_DELIMITER + "*");
 			while (true) {
 				KeyScanCursor<String> keyScanCursor = cmd.scan(scanCursor, scanArgs);
-				if (keyScanCursor.isFinished()) {
+				if (keyScanCursor.isFinished() || keyScanCursor.getKeys().size() <= 0) {
 					break;
 				}
 				keys += keyScanCursor.getKeys().size();
