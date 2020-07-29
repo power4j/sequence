@@ -1,6 +1,6 @@
 # JAVA 序号工具包 Sequence
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/2e14662a58474e6593ead49c81d70bd6)](https://www.codacy.com/gh/power4j/sequence?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=power4j/sequence&amp;utm_campaign=Badge_Grade)
-[![codebeat badge](https://codebeat.co/badges/abec5291-8b69-408d-8515-ed65951f7eb5)](https://codebeat.co/projects/github-com-power4j-sequence-master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/bad24df7d1364e1bbbfea77f3378ad1a)](https://app.codacy.com/gh/power4j/sequence?utm_source=github.com&utm_medium=referral&utm_content=power4j/sequence&utm_campaign=Badge_Grade_Dashboard)
+[![codecov](https://codecov.io/gh/power4j/sequence/branch/master/graph/badge.svg)](https://codecov.io/gh/power4j/sequence)
 [![travis-ci](https://travis-ci.org/power4j/sequence.svg)](https://travis-ci.org/github/power4j/sequence)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.power4j.kit/sequence/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.power4j.kit/sequence)
 
