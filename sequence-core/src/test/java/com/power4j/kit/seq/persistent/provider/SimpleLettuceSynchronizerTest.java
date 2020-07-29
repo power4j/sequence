@@ -30,14 +30,14 @@ public class SimpleLettuceSynchronizerTest extends SynchronizerTestCase {
 	private SimpleLettuceSynchronizer simpleLettuceSynchronizer;
 
 	@Before
-	public void prepare() {
+	public void setUp() {
 		redisClient = TestServices.getRedisClient();
 		simpleLettuceSynchronizer = new SimpleLettuceSynchronizer(SEQ_CACHE_NAME, redisClient);
 		simpleLettuceSynchronizer.init();
 	}
 
 	@After
-	public void teardown() {
+	public void tearDown() {
 		if (simpleLettuceSynchronizer != null) {
 			simpleLettuceSynchronizer.removeCache();
 		}

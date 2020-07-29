@@ -41,7 +41,7 @@ public class LettuceSeqHolderTest extends SeqHolderTestCase {
 	@Before
 	public void setUp() {
 		redisClient = TestServices.getRedisClient();
-		seqSynchronizer = new SimpleLettuceSynchronizer(SEQ_CACHE_NAME, redisClient);
+		SimpleLettuceSynchronizer seqSynchronizer = new SimpleLettuceSynchronizer(SEQ_CACHE_NAME, redisClient);
 		seqSynchronizer.init();
 		holder = new SeqHolder(seqSynchronizer, seqName, partition, 1L, 1000, SeqFormatter.DEFAULT_FORMAT);
 		holder.prepare();

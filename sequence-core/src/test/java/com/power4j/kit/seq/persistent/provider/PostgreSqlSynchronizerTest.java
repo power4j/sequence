@@ -27,13 +27,13 @@ public class PostgreSqlSynchronizerTest extends SynchronizerTestCase {
 	private PostgreSqlSynchronizer postgreSqlSynchronizer;
 
 	@Before
-	public void prepare() {
+	public void setUp() {
 		postgreSqlSynchronizer = new PostgreSqlSynchronizer(SEQ_TABLE, TestServices.getPostgreSqlDataSource());
 		postgreSqlSynchronizer.init();
 	}
 
 	@After
-	public void teardown() {
+	public void tearDown() {
 		if (postgreSqlSynchronizer != null) {
 			postgreSqlSynchronizer.dropTable();
 		}

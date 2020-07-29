@@ -123,10 +123,8 @@ public class PostgreSqlSynchronizer extends AbstractSqlStatementProvider impleme
 			log.debug(String.format("param: [%d] [%s] [%s] [%s]", delta, now.toString(), name, partition));
 			updateCount.incrementAndGet();
 			try (ResultSet resultSet = statement.executeQuery()) {
-				if (resultSet.next()) {
-					if (resultSet.getObject(1) != null) {
-						return Optional.of(resultSet.getLong(1));
-					}
+				if (resultSet.next() && resultSet.getObject(1) != null) {
+					return Optional.of(resultSet.getLong(1));
 				}
 			}
 		}

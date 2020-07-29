@@ -48,7 +48,7 @@ public class MongoSeqHolderTest extends SeqHolderTestCase {
 	@Before
 	public void setUp() {
 		mongoClient = TestServices.getMongoClient();
-		seqSynchronizer = new SimpleMongoSynchronizer(DB_NAME, COL_NAME, mongoClient);
+		SimpleMongoSynchronizer seqSynchronizer = new SimpleMongoSynchronizer(DB_NAME, COL_NAME, mongoClient);
 		seqSynchronizer.init();
 		holder = new SeqHolder(seqSynchronizer, seqName, partition, 1L, 1000, SeqFormatter.DEFAULT_FORMAT);
 		holder.prepare();

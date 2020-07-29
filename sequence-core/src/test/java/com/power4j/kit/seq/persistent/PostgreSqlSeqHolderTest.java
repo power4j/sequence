@@ -50,7 +50,9 @@ public class PostgreSqlSeqHolderTest extends SeqHolderTestCase {
 
 	@After
 	public void tearDown() {
-		seqSynchronizer.dropTable();
+		if (seqSynchronizer != null) {
+			seqSynchronizer.dropTable();
+		}
 	}
 
 	@Override
