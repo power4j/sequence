@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * @author CJ (power4j@outlook.com)
  * @date 2020/7/17
- * @since 1.0
+ * @since 1.2
  */
 @Slf4j
 @AllArgsConstructor

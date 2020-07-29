@@ -17,6 +17,7 @@
 package com.power4j.kit.seq.persistent.provider;
 
 import com.power4j.kit.seq.core.exceptions.SeqException;
+import com.power4j.kit.seq.persistent.AddState;
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,43 +28,47 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
- * MySql支持
+ * PostgreSQL 支持
  *
  * @author CJ (power4j@outlook.com)
- * @date 2020/7/1
- * @since 1.0
+ * @date 2020/7/29
+ * @since 1.3
  */
 @Slf4j
 @AllArgsConstructor
-public class MySqlSynchronizer extends AbstractJdbcSynchronizer implements SeqSynchronizer {
+public class PostgreSqlSynchronizer extends AbstractJdbcSynchronizer implements SeqSynchronizer {
 
 	// @formatter:off
 
-	private final static String MYSQL_CREATE_TABLE =
-            "CREATE TABLE IF NOT EXISTS $TABLE_NAME (" +
-                "seq_name VARCHAR ( 255 ) NOT NULL," +
-                "seq_partition VARCHAR ( 255 ) NOT NULL," +
-                "seq_next_value BIGINT NOT NULL," +
-                "seq_create_time TIMESTAMP NOT NULL," +
-                "seq_update_time TIMESTAMP NULL," +
-                "PRIMARY KEY ( `seq_name`, `seq_partition` ) " +
-            ")";
+	private final static String POSTGRESQL_CREATE_TABLE =
+			"CREATE TABLE IF NOT EXISTS $TABLE_NAME (" +
+					"seq_name VARCHAR ( 255 ) NOT NULL," +
+					"seq_partition VARCHAR ( 255 ) NOT NULL," +
+					"seq_next_value BIGINT NOT NULL," +
+					"seq_create_time TIMESTAMP NOT NULL," +
+					"seq_update_time TIMESTAMP NULL," +
+					"PRIMARY KEY ( seq_name, seq_partition ) " +
+					")";
 
-	private final static String MYSQL_DROP_TABLE = "DROP TABLE IF EXISTS $TABLE_NAME";
+	private final static String POSTGRESQL_DROP_TABLE = "DROP TABLE IF EXISTS $TABLE_NAME";
 
-	private final static String MYSQL_INSERT_IGNORE =
-			"INSERT IGNORE INTO $TABLE_NAME" +
+	private final static String POSTGRESQL_INSERT_IGNORE =
+			"INSERT INTO $TABLE_NAME" +
 					"(seq_name,seq_partition,seq_next_value,seq_create_time)" +
-					" VALUES (?,?,?,?)";
+					" VALUES (?,?,?,?) ON CONFLICT(seq_name, seq_partition) DO NOTHING";
 
-	private final static String MYSQL_UPDATE_VALUE =
+	private final static String POSTGRESQL_UPDATE_VALUE =
 			"UPDATE $TABLE_NAME SET seq_next_value=?,seq_update_time=? " +
 					"WHERE seq_name=? AND seq_partition=? AND seq_next_value=?";
 
-	private final static String MYSQL_SELECT_VALUE =
+	private final static String POSTGRESQL_ADD_VALUE =
+			"UPDATE $TABLE_NAME SET seq_next_value=seq_next_value + ?,seq_update_time=? " +
+					"WHERE seq_name=? AND seq_partition=? RETURNING seq_next_value";
+
+	private final static String POSTGRESQL_SELECT_VALUE =
 			"SELECT seq_next_value FROM $TABLE_NAME WHERE seq_name=? AND seq_partition=?";
 
-    // @formatter:on
+	// @formatter:on
 
 	private final String tableName;
 
@@ -72,7 +77,7 @@ public class MySqlSynchronizer extends AbstractJdbcSynchronizer implements SeqSy
 	@Override
 	public void createMissingTable() {
 		log.info("create table if not exists : {}", tableName);
-		final String sql = MYSQL_CREATE_TABLE.replace("$TABLE_NAME", tableName);
+		final String sql = POSTGRESQL_CREATE_TABLE.replace("$TABLE_NAME", tableName);
 		log.debug(sql);
 		try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.executeUpdate();
@@ -86,7 +91,7 @@ public class MySqlSynchronizer extends AbstractJdbcSynchronizer implements SeqSy
 	@Override
 	public void dropTable() {
 		log.warn("drop table if exists : {}", tableName);
-		final String sql = MYSQL_DROP_TABLE.replace("$TABLE_NAME", tableName);
+		final String sql = POSTGRESQL_DROP_TABLE.replace("$TABLE_NAME", tableName);
 		log.debug(sql);
 		try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.executeUpdate();
@@ -99,12 +104,13 @@ public class MySqlSynchronizer extends AbstractJdbcSynchronizer implements SeqSy
 
 	@Override
 	protected Optional<Long> selectSeqValue(Connection connection, String name, String partition) throws SQLException {
-		final String sql = MYSQL_SELECT_VALUE.replace("$TABLE_NAME", tableName);
+		final String sql = POSTGRESQL_SELECT_VALUE.replace("$TABLE_NAME", tableName);
 		log.debug(sql);
 		try (PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setString(1, name);
 			statement.setString(2, partition);
 			log.debug(String.format("param: [%s] [%s]", name, partition));
+			updateCount.incrementAndGet();
 			try (ResultSet resultSet = statement.executeQuery()) {
 				if (resultSet.next()) {
 					if (resultSet.getObject(1) == null) {
@@ -121,7 +127,7 @@ public class MySqlSynchronizer extends AbstractJdbcSynchronizer implements SeqSy
 	protected boolean createMissingSeqEntry(Connection connection, String name, String partition, long nextValue)
 			throws SQLException {
 		final Timestamp now = Timestamp.valueOf(LocalDateTime.now());
-		final String sql = MYSQL_INSERT_IGNORE.replace("$TABLE_NAME", tableName);
+		final String sql = POSTGRESQL_INSERT_IGNORE.replace("$TABLE_NAME", tableName);
 		log.debug(sql);
 		try (PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setString(1, name);
@@ -139,7 +145,7 @@ public class MySqlSynchronizer extends AbstractJdbcSynchronizer implements SeqSy
 	protected boolean updateSeqValue(Connection connection, String name, String partition, long nextValueOld,
 			long nextValueNew) throws SQLException {
 		final Timestamp now = Timestamp.valueOf(LocalDateTime.now());
-		final String sql = MYSQL_UPDATE_VALUE.replace("$TABLE_NAME", tableName);
+		final String sql = POSTGRESQL_UPDATE_VALUE.replace("$TABLE_NAME", tableName);
 		log.debug(sql);
 		try (PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setLong(1, nextValueNew);
@@ -164,6 +170,50 @@ public class MySqlSynchronizer extends AbstractJdbcSynchronizer implements SeqSy
 			log.warn(e.getMessage(), e);
 			throw new SeqException(e.getMessage(), e);
 		}
+	}
+
+	@Override
+	public AddState tryAddAndGet(String name, String partition, int delta, int maxReTry) {
+		try (Connection connection = getConnection()) {
+			return addAndGet(connection, name, partition, delta).map(val -> AddState.success(val - delta, val, 1))
+					.orElseThrow(() -> new SeqException(String.format("Not exist: %s %s", name, partition)));
+		}
+		catch (SQLException e) {
+			log.warn(e.getMessage(), e);
+			throw new SeqException(e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * 加法操作
+	 * @param connection
+	 * @param name
+	 * @param partition
+	 * @param delta
+	 * @return 返回加法操作后的结果,如果记录不存在返回null
+	 * @throws SQLException
+	 */
+	private Optional<Long> addAndGet(Connection connection, String name, String partition, int delta)
+			throws SQLException {
+		final Timestamp now = Timestamp.valueOf(LocalDateTime.now());
+		final String sql = POSTGRESQL_ADD_VALUE.replace("$TABLE_NAME", tableName);
+		log.debug(sql);
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
+			statement.setInt(1, delta);
+			statement.setTimestamp(2, now);
+			statement.setString(3, name);
+			statement.setString(4, partition);
+			log.debug(String.format("param: [%d] [%s] [%s] [%s]", delta, now.toString(), name, partition));
+			updateCount.incrementAndGet();
+			try (ResultSet resultSet = statement.executeQuery()) {
+				if (resultSet.next()) {
+					if (resultSet.getObject(1) != null) {
+						return Optional.of(resultSet.getLong(1));
+					}
+				}
+			}
+		}
+		return Optional.empty();
 	}
 
 }

@@ -18,7 +18,7 @@ package com.power4j.kit.seq;
 
 import com.power4j.kit.seq.persistent.SeqHolder;
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
-import com.power4j.kit.seq.persistent.provider.MySqlSynchronizer;
+import com.power4j.kit.seq.persistent.provider.PostgreSqlSynchronizer;
 import com.power4j.kit.seq.utils.EnvUtil;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -31,11 +31,9 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 取号器，使用MysSql作为后端
- *
  * @author CJ (power4j@outlook.com)
- * @date 2020/7/4
- * @since 1.0
+ * @date 2020/7/29
+ * @since 1.3
  */
 @State(Scope.Benchmark)
 @Threads(Threads.MAX)
@@ -45,11 +43,11 @@ import java.util.concurrent.TimeUnit;
 @Warmup(iterations = 1, time = 3)
 @Measurement(iterations = 3, time = 10)
 @OutputTimeUnit(TimeUnit.SECONDS)
-public class MySqlSeqHolderBench {
+public class PostgreSqlSeqHolderBench {
 
-	private final static String DEFAULT_MYSQL_JDBC_URL = "jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false";
+	private final static String DEFAULT_POSTGRESQL_JDBC_URL = "jdbc:postgresql://127.0.0.1:5432/test?ssl=false";
 
-	private final static String JDBC_URL = EnvUtil.getStr("TEST_MYSQL_URL", DEFAULT_MYSQL_JDBC_URL);
+	private final static String JDBC_URL = EnvUtil.getStr("TEST_POSTGRESQL_URL", DEFAULT_POSTGRESQL_JDBC_URL);
 
 	private static SeqSynchronizer synchronizer;
 
@@ -59,11 +57,11 @@ public class MySqlSeqHolderBench {
 	public void setup() {
 		HikariConfig config = new HikariConfig();
 		config.setJdbcUrl(JDBC_URL);
-		config.setUsername(EnvUtil.getStr("TEST_MYSQL_USER", "root"));
-		config.setPassword(EnvUtil.getStr("TEST_MYSQL_PWD", "root"));
-		synchronizer = new MySqlSynchronizer("seq_bench", new HikariDataSource(config));
+		config.setUsername(EnvUtil.getStr("TEST_POSTGRESQL_USER", "root"));
+		config.setPassword(EnvUtil.getStr("TEST_POSTGRESQL_PWD", "root"));
+		synchronizer = new PostgreSqlSynchronizer("seq_bench", new HikariDataSource(config));
 		synchronizer.init();
-		seqHolder = new SeqHolder(synchronizer, "mysql-bench-test", TestUtil.getPartitionName(),
+		seqHolder = new SeqHolder(synchronizer, "postgresql-bench-test", TestUtil.getPartitionName(),
 				BenchParam.SEQ_INIT_VAL, BenchParam.SEQ_POOL_SIZE, null);
 		seqHolder.prepare();
 	}
@@ -74,7 +72,7 @@ public class MySqlSeqHolderBench {
 	}
 
 	public static void main(String[] args) throws Exception {
-		Options opt = new OptionsBuilder().include(MySqlSeqHolderBench.class.getSimpleName()).build();
+		Options opt = new OptionsBuilder().include(PostgreSqlSeqHolderBench.class.getSimpleName()).build();
 		new Runner(opt).run();
 	}
 

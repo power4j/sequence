@@ -36,9 +36,9 @@ import java.util.concurrent.atomic.AtomicLong;
 @Slf4j
 public abstract class AbstractJdbcSynchronizer implements SeqSynchronizer {
 
-	private final AtomicLong queryCount = new AtomicLong();
+	protected final AtomicLong queryCount = new AtomicLong();
 
-	private final AtomicLong updateCount = new AtomicLong();
+	protected final AtomicLong updateCount = new AtomicLong();
 
 	/**
 	 * 获取数据库连接

@@ -14,6 +14,7 @@ language: java
 jdk:
  - openjdk8
  - openjdk11
+ - openjdk14
 
 cache:
   directories:
@@ -35,8 +36,13 @@ before_script:
 
 before_install:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
+  - psql -c 'create database test;' -U postgres
 
 services:
   - mysql
   - mongodb
   - redis-server
+  - postgresql
+
+addons:
+  postgresql: "9.6"
