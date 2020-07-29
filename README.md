@@ -1,4 +1,5 @@
 # JAVA 序号工具包 Sequence
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/bad24df7d1364e1bbbfea77f3378ad1a)](https://app.codacy.com/gh/power4j/sequence?utm_source=github.com&utm_medium=referral&utm_content=power4j/sequence&utm_campaign=Badge_Grade_Dashboard)
 [![CodeFactor](https://www.codefactor.io/repository/github/power4j/sequence/badge/master)](https://www.codefactor.io/repository/github/power4j/sequence/overview/master)
 [![codebeat badge](https://codebeat.co/badges/abec5291-8b69-408d-8515-ed65951f7eb5)](https://codebeat.co/projects/github-com-power4j-sequence-master)
 [![codecov](https://codecov.io/gh/power4j/sequence/branch/master/graph/badge.svg)](https://codecov.io/gh/power4j/sequence)
