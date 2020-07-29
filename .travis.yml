@@ -29,6 +29,7 @@ script:
 # If a build is successful, the code is submitted for coverage analysis
 # tip: export CODECOV_TOKEN="xxx"
 after_success:
+  - bash <(curl -s https://codecov.io/bash)
   - bash <(curl -Ls https://coverage.codacy.com/get.sh)
 
 before_script:
