@@ -2,8 +2,17 @@ server:
   port: 8080
 
 spring:
+  profiles:
+    # mysql, postgresql
+    active: postgresql
+
+power4j:
+  sequence:
+    fetch-size: 10
+---
+spring:
+  profiles: mysql
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
     url: "jdbc:mysql://${MYSQL_HOST:localhost}:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false"
     username: root
     password: root
@@ -12,3 +21,15 @@ power4j:
   sequence:
     # 数据同步使用的后端支持(如: mysql,oracle,redis)
     backend: mysql
+---
+spring:
+  profiles: postgresql
+  datasource:
+    url: "jdbc:postgresql://${POSTGRESQL_HOST:localhost}:5432/test?ssl=false"
+    username: root
+    password: root
+
+power4j:
+  sequence:
+    # 数据同步使用的后端支持(如: mysql,oracle,redis)
+    backend: postgresql

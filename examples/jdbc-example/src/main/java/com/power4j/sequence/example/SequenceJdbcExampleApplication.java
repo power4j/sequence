@@ -44,7 +44,7 @@ public class SequenceJdbcExampleApplication {
 		SpringApplication.run(SequenceJdbcExampleApplication.class, args);
 	}
 
-	@GetMapping("/seq")
+	@GetMapping("/")
 	public Map<String, Object> getSequence(@RequestParam(required = false) Integer size) {
 		size = (size == null || size <= 0) ? 10 : size;
 		List<String> list = new ArrayList<>(size);

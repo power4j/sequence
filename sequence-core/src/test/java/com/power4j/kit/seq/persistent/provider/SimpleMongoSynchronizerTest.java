@@ -32,14 +32,14 @@ public class SimpleMongoSynchronizerTest extends SynchronizerTestCase {
 	private SimpleMongoSynchronizer simpleMongoSynchronizer;
 
 	@Before
-	public void prepare() {
+	public void setUp() {
 		mongoClient = TestServices.getMongoClient();
 		simpleMongoSynchronizer = new SimpleMongoSynchronizer(DB_NAME, COLL_NAME, mongoClient);
 		simpleMongoSynchronizer.init();
 	}
 
 	@After
-	public void teardown() {
+	public void tearDown() {
 		if (simpleMongoSynchronizer != null) {
 			simpleMongoSynchronizer.dropCollection();
 		}

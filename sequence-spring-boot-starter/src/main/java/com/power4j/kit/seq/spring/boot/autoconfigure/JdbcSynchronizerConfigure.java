@@ -18,6 +18,7 @@ package com.power4j.kit.seq.spring.boot.autoconfigure;
 
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
 import com.power4j.kit.seq.persistent.provider.MySqlSynchronizer;
+import com.power4j.kit.seq.persistent.provider.PostgreSqlSynchronizer;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -43,6 +44,18 @@ public class JdbcSynchronizerConfigure {
 	@ConditionalOnProperty(prefix = SequenceProperties.PREFIX, name = "backend", havingValue = "mysql")
 	public SeqSynchronizer mysqlSynchronizer(SequenceProperties sequenceProperties, DataSource dataSource) {
 		MySqlSynchronizer synchronizer = new MySqlSynchronizer(sequenceProperties.getTableName(), dataSource);
+		if (!sequenceProperties.isLazyInit()) {
+			synchronizer.init();
+		}
+		return synchronizer;
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	@ConditionalOnBean(DataSource.class)
+	@ConditionalOnProperty(prefix = SequenceProperties.PREFIX, name = "backend", havingValue = "postgresql")
+	public SeqSynchronizer postgreSqlSynchronizer(SequenceProperties sequenceProperties, DataSource dataSource) {
+		PostgreSqlSynchronizer synchronizer = new PostgreSqlSynchronizer(sequenceProperties.getTableName(), dataSource);
 		if (!sequenceProperties.isLazyInit()) {
 			synchronizer.init();
 		}

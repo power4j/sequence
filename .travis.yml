@@ -14,6 +14,7 @@ language: java
 jdk:
  - openjdk8
  - openjdk11
+ - openjdk14
 
 cache:
   directories:
@@ -29,14 +30,20 @@ script:
 # tip: export CODECOV_TOKEN="xxx"
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+  - bash <(curl -Ls https://coverage.codacy.com/get.sh)
 
 before_script:
   - git config --global core.autocrlf input
 
 before_install:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
+  - psql -c 'create database test;' -U postgres
 
 services:
   - mysql
   - mongodb
   - redis-server
+  - postgresql
+
+addons:
+  postgresql: "9.6"

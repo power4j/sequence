@@ -30,7 +30,7 @@ import java.util.concurrent.CountDownLatch;
 @UtilityClass
 public class TestUtil {
 
-	public String StrNow() {
+	public String strNow() {
 		return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
 	}
 

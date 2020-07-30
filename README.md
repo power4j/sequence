@@ -1,7 +1,5 @@
 # JAVA 序号工具包 Sequence
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/bad24df7d1364e1bbbfea77f3378ad1a)](https://app.codacy.com/gh/power4j/sequence?utm_source=github.com&utm_medium=referral&utm_content=power4j/sequence&utm_campaign=Badge_Grade_Dashboard)
-[![CodeFactor](https://www.codefactor.io/repository/github/power4j/sequence/badge/master)](https://www.codefactor.io/repository/github/power4j/sequence/overview/master)
-[![codebeat badge](https://codebeat.co/badges/abec5291-8b69-408d-8515-ed65951f7eb5)](https://codebeat.co/projects/github-com-power4j-sequence-master)
 [![codecov](https://codecov.io/gh/power4j/sequence/branch/master/graph/badge.svg)](https://codecov.io/gh/power4j/sequence)
 [![travis-ci](https://travis-ci.org/power4j/sequence.svg)](https://travis-ci.org/github/power4j/sequence)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.power4j.kit/sequence/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.power4j.kit/sequence)
@@ -21,6 +19,13 @@
 ## 项目说明
 
 - ***JDK 版本要求: `JDK8+`*** 
+
+- 支持的后端
+  - MySQL
+  - PostgreSQL (`9.6 +`)
+  - Redis
+  - MongoDB
+
 
 ## 核心概念
 
@@ -100,14 +105,16 @@ public class SequenceExampleApplication {
 # VM invoker: /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.252.b09-2.el7_8.x86_64/jre/bin/java
 # VM options: -server -Xms32m -Xmx128m -Xmn64m -XX:CMSInitiatingOccupancyFraction=82 -Xss256k -XX:LargePageSizeInBytes=64m
 
-Benchmark                      Mode  Cnt         Score          Error  Units
-LettuceSeqHolderBench.getSeq  thrpt    3   3682420.572 ±  1058146.431  ops/s
-LongSeqPoolBench.getSeq       thrpt    3  75273390.592 ± 72699905.480  ops/s
-MongoSeqHolderBench.getSeq    thrpt    3   1305400.597 ±  8767008.399  ops/s
-MySqlSeqHolderBench.getSeq    thrpt    3     90594.876 ±    67488.430  ops/s
+
+Benchmark                         Mode  Cnt         Score          Error  Units
+LettuceSeqHolderBench.getSeq     thrpt    3   3814342.579 ±  1458928.749  ops/s
+LongSeqPoolBench.getSeq          thrpt    3  77560480.796 ± 72152367.393  ops/s
+MongoSeqHolderBench.getSeq       thrpt    3   1363826.330 ±  8857057.928  ops/s
+MySqlSeqHolderBench.getSeq       thrpt    3    112325.398 ±    67063.696  ops/s
+PostgreSqlSeqHolderBench.getSeq  thrpt    3    605173.501 ±  1355092.903  ops/s
 
 ```
-> 分数: 裸奔: 7500万, redis: 360万,MySQL:9万,MongoDB 130万 
+> OPS:  裸奔 7500万 redis: 380万 MySQL: 11万 MongoDB 130万  PostgreSQL 60万
 
 - 分数看看就好,纯跑分没什么意义,只能作为一个性能参考。
 - 需要自己测试，已经为你写好测试脚本,见[run-bench.sh](bench-test/run-bench.sh)
@@ -126,7 +133,7 @@ MySqlSeqHolderBench.getSeq    thrpt    3     90594.876 ±    67488.430  ops/s
 ## 开发计划
 
  - [X] 支持MySQL(`1.0`)
- - [ ] 支持PostgreSQL(`1.3`)
+ - [X] 支持PostgreSQL(`1.3`)
  - [ ] 支持H2(不一定会支持,因为缺乏应用场景)
  - [ ] 支持Oracle(不一定会支持,这货没有开源版本)
  - [x] 支持Redis(`1.1`)

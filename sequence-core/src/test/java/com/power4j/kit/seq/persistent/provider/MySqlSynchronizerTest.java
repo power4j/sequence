@@ -35,13 +35,13 @@ public class MySqlSynchronizerTest extends SynchronizerTestCase {
 	private MySqlSynchronizer mySqlSynchronizer;
 
 	@Before
-	public void prepare() {
+	public void setUp() {
 		mySqlSynchronizer = new MySqlSynchronizer(SEQ_TABLE, TestServices.getMySqlDataSource());
 		mySqlSynchronizer.init();
 	}
 
 	@After
-	public void teardown() {
+	public void tearDown() {
 		if (mySqlSynchronizer != null) {
 			mySqlSynchronizer.dropTable();
 		}

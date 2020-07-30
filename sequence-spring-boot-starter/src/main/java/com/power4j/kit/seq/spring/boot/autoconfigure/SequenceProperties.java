@@ -93,7 +93,11 @@ public class SequenceProperties {
 		/**
 		 * MongoDB
 		 */
-		mongo
+		mongo,
+		/**
+		 * PostgreSQL
+		 */
+		postgresql
 
 	}
 

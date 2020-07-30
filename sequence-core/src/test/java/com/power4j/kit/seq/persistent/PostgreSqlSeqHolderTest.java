@@ -18,30 +18,31 @@ package com.power4j.kit.seq.persistent;
 
 import com.power4j.kit.seq.TestUtil;
 import com.power4j.kit.seq.core.SeqFormatter;
-import com.power4j.kit.seq.persistent.provider.SimpleLettuceSynchronizer;
+import com.power4j.kit.seq.persistent.provider.PostgreSqlSynchronizer;
 import com.power4j.kit.seq.persistent.provider.TestServices;
-import io.lettuce.core.RedisClient;
 import org.junit.After;
 import org.junit.Before;
 
-public class LettuceSeqHolderTest extends SeqHolderTestCase {
+/**
+ * @author CJ (power4j@outlook.com)
+ * @date 2020/7/29
+ * @since 1.3
+ */
+public class PostgreSqlSeqHolderTest extends SeqHolderTestCase {
 
-	public final static String SEQ_CACHE_NAME = "power4j:" + LettuceSeqHolderTest.class.getSimpleName();
+	public final static String SEQ_TABLE = "tb_seq";
 
-	public final String seqName = "seq_holder_test";
+	public final String seqName = "power4j_" + PostgreSqlSeqHolderTest.class.getSimpleName();
 
 	public final String partition = TestUtil.strNow();
 
-	private RedisClient redisClient;
-
-	private SimpleLettuceSynchronizer seqSynchronizer;
+	private PostgreSqlSynchronizer seqSynchronizer;
 
 	private SeqHolder holder;
 
 	@Before
 	public void setUp() {
-		redisClient = TestServices.getRedisClient();
-		SimpleLettuceSynchronizer seqSynchronizer = new SimpleLettuceSynchronizer(SEQ_CACHE_NAME, redisClient);
+		seqSynchronizer = new PostgreSqlSynchronizer(SEQ_TABLE, TestServices.getPostgreSqlDataSource());
 		seqSynchronizer.init();
 		holder = new SeqHolder(seqSynchronizer, seqName, partition, 1L, 1000, SeqFormatter.DEFAULT_FORMAT);
 		holder.prepare();
@@ -49,8 +50,8 @@ public class LettuceSeqHolderTest extends SeqHolderTestCase {
 
 	@After
 	public void tearDown() {
-		if (redisClient != null) {
-			redisClient.shutdown();
+		if (seqSynchronizer != null) {
+			seqSynchronizer.dropTable();
 		}
 	}
 

@@ -17,38 +17,31 @@
 package com.power4j.kit.seq.persistent.provider;
 
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
-import io.lettuce.core.RedisClient;
 import org.junit.After;
 import org.junit.Before;
 
-public class SimpleLettuceSynchronizerTest extends SynchronizerTestCase {
+public class PostgreSqlSynchronizerTest extends SynchronizerTestCase {
 
-	public final static String SEQ_CACHE_NAME = "power4j:seq-test";
+	public final static String SEQ_TABLE = "tb_seq";
 
-	private RedisClient redisClient;
-
-	private SimpleLettuceSynchronizer simpleLettuceSynchronizer;
+	private PostgreSqlSynchronizer postgreSqlSynchronizer;
 
 	@Before
 	public void setUp() {
-		redisClient = TestServices.getRedisClient();
-		simpleLettuceSynchronizer = new SimpleLettuceSynchronizer(SEQ_CACHE_NAME, redisClient);
-		simpleLettuceSynchronizer.init();
+		postgreSqlSynchronizer = new PostgreSqlSynchronizer(SEQ_TABLE, TestServices.getPostgreSqlDataSource());
+		postgreSqlSynchronizer.init();
 	}
 
 	@After
 	public void tearDown() {
-		if (simpleLettuceSynchronizer != null) {
-			simpleLettuceSynchronizer.removeCache();
-		}
-		if (redisClient != null) {
-			redisClient.shutdown();
+		if (postgreSqlSynchronizer != null) {
+			postgreSqlSynchronizer.dropTable();
 		}
 	}
 
 	@Override
 	protected SeqSynchronizer getSeqSynchronizer() {
-		return simpleLettuceSynchronizer;
+		return postgreSqlSynchronizer;
 	}
 
 }

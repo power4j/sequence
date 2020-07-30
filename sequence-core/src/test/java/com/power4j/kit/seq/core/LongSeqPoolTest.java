@@ -16,14 +16,25 @@
 
 package com.power4j.kit.seq.core;
 
+import lombok.extern.slf4j.Slf4j;
+import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
-
+@Slf4j
 public class LongSeqPoolTest {
 
 	private final String poolName = "test-seq-pool";
@@ -33,17 +44,17 @@ public class LongSeqPoolTest {
 		long start = LongSeqPool.MIN_VALUE;
 		int size = 2;
 		LongSeqPool pool = LongSeqPool.forSize(poolName, start, size, false);
-		assertEquals(pool.minValue().longValue(), start);
-		assertEquals(pool.capacity(), size);
-		assertEquals(pool.remaining(), size);
-		assertEquals(pool.peek().longValue(), start);
+		Assert.assertEquals(pool.minValue().longValue(), start);
+		Assert.assertEquals(pool.capacity(), size);
+		Assert.assertEquals(pool.remaining(), size);
+		Assert.assertEquals(pool.peek().longValue(), start);
 		for (int i = 0; i < size; ++i) {
 			long val = pool.next();
-			assertEquals(pool.capacity(), size);
-			assertEquals(pool.remaining(), size - (i + 1));
-			assertEquals(val, start + i);
+			Assert.assertEquals(pool.capacity(), size);
+			Assert.assertEquals(pool.remaining(), size - (i + 1));
+			Assert.assertEquals(val, start + i);
 		}
-		assertEquals(pool.remaining(), 0);
+		Assert.assertEquals(pool.remaining(), 0);
 	}
 
 	@Test
@@ -51,18 +62,18 @@ public class LongSeqPoolTest {
 		long start = LongSeqPool.MAX_VALUE;
 		int size = 1;
 		LongSeqPool pool = LongSeqPool.forSize(poolName, start, size, false);
-		assertEquals(pool.minValue().longValue(), start);
-		assertEquals(pool.maxValue().longValue(), start);
-		assertEquals(pool.capacity(), size);
-		assertEquals(pool.remaining(), size);
-		assertEquals(pool.peek().longValue(), start);
+		Assert.assertEquals(pool.minValue().longValue(), start);
+		Assert.assertEquals(pool.maxValue().longValue(), start);
+		Assert.assertEquals(pool.capacity(), size);
+		Assert.assertEquals(pool.remaining(), size);
+		Assert.assertEquals(pool.peek().longValue(), start);
 		for (int i = 0; i < size; ++i) {
 			long val = pool.next();
-			assertEquals(pool.capacity(), size);
-			assertEquals(pool.remaining(), size - (i + 1));
-			assertEquals(val, start + i);
+			Assert.assertEquals(pool.capacity(), size);
+			Assert.assertEquals(pool.remaining(), size - (i + 1));
+			Assert.assertEquals(val, start + i);
 		}
-		assertEquals(pool.remaining(), 0);
+		Assert.assertEquals(pool.remaining(), 0);
 	}
 
 	@Test
@@ -71,18 +82,18 @@ public class LongSeqPoolTest {
 		final int size = 200;
 		LongSeqPool pool = LongSeqPool.forSize(poolName, start, size, false);
 
-		assertEquals(pool.capacity(), size);
-		assertEquals(pool.remaining(), size);
-		assertEquals(pool.peek().longValue(), start);
+		Assert.assertEquals(pool.capacity(), size);
+		Assert.assertEquals(pool.remaining(), size);
+		Assert.assertEquals(pool.peek().longValue(), start);
 
 		for (int i = 0; i < size; ++i) {
 			long val = pool.take();
 			int taken = i + 1;
-			System.out.println(String.format("#[%04d] get = %d, peek next = %d, remaining = %d", taken, val,
-					pool.peek(), pool.remaining()));
-			assertEquals(pool.capacity(), size);
-			assertEquals(pool.remaining(), size - taken);
-			assertEquals(val, start + i);
+			log.info(String.format("#[%04d] get = %d, peek next = %d, remaining = %d", taken, val, pool.peek(),
+					pool.remaining()));
+			Assert.assertEquals(pool.capacity(), size);
+			Assert.assertEquals(pool.remaining(), size - taken);
+			Assert.assertEquals(val, start + i);
 		}
 	}
 
@@ -96,11 +107,11 @@ public class LongSeqPoolTest {
 			for (int i = 0; i < size; ++i) {
 				long val = pool.take();
 				int taken = i + 1;
-				System.out.println(String.format("#[%04d] get = %d, peek next = %d, remaining = %d", taken, val,
-						pool.peek(), pool.remaining()));
-				assertEquals(pool.capacity(), size);
-				assertEquals(pool.remaining(), size);
-				assertEquals(val, start + i);
+				log.info(String.format("#[%04d] get = %d, peek next = %d, remaining = %d", taken, val, pool.peek(),
+						pool.remaining()));
+				Assert.assertEquals(pool.capacity(), size);
+				Assert.assertEquals(pool.remaining(), size);
+				Assert.assertEquals(val, start + i);
 			}
 		}
 	}
@@ -108,16 +119,16 @@ public class LongSeqPoolTest {
 	@Test
 	public void forRangeTest() {
 		LongSeqPool pool = LongSeqPool.forRange(poolName, 1, 2, false);
-		assertEquals(pool.capacity(), 2);
+		Assert.assertEquals(pool.capacity(), 2);
 
 		Optional<Long> val = pool.nextOpt();
-		assertTrue(val.isPresent());
+		Assert.assertTrue(val.isPresent());
 
 		val = pool.nextOpt();
-		assertTrue(val.isPresent());
+		Assert.assertTrue(val.isPresent());
 
 		val = pool.nextOpt();
-		assertFalse(val.isPresent());
+		Assert.assertFalse(val.isPresent());
 	}
 
 	@Test
@@ -128,11 +139,11 @@ public class LongSeqPoolTest {
 
 		for (int i = 0; i < size; ++i) {
 			LongSeqPool fork = pool.fork(poolName);
-			assertEquals(pool.peek(), fork.peek());
+			Assert.assertEquals(pool.peek(), fork.peek());
 			long val1 = pool.take();
 			long val2 = fork.take();
-			assertEquals(val1, val2);
-			assertEquals(pool.remaining(), fork.remaining());
+			Assert.assertEquals(val1, val2);
+			Assert.assertEquals(pool.remaining(), fork.remaining());
 		}
 	}
 
@@ -181,21 +192,21 @@ public class LongSeqPoolTest {
 		threadResults.entrySet().forEach(kv -> {
 			Set<Long> distinct = kv.getValue().stream().collect(Collectors.toSet());
 			// 采样数量一样，但是消费能力不一样，因此去重后数量有所不同
-			System.out.println(String.format("thread[%s] size = %d,distinct = %d", kv.getKey(), kv.getValue().size(),
+			log.info(String.format("thread[%s] size = %d,distinct = %d", kv.getKey(), kv.getValue().size(),
 					distinct.size()));
 		});
 
 		// 把所有线程的采样数据聚合 -> 排序 -> 根据线程数量分片 -> 每个分片的数量应该相同
 		List<Long> all = threadResults.values().stream().flatMap(List::stream).collect(Collectors.toList());
 		// 每个线程执行了 N 次 next
-		assertEquals(all.size(), threads * size);
+		Assert.assertEquals(all.size(), threads * size);
 		all.sort(Long::compareTo);
 		List<List<Long>> bad = splitCollection(all, threads).stream().filter(list -> list.size() != threads)
 				.collect(Collectors.toList());
 
 		bad.forEach(list -> System.out
 				.println("发现异常数据: " + list.stream().map(v -> v.toString()).collect(Collectors.joining(", "))));
-		assertEquals(bad.size(), 0);
+		Assert.assertEquals(bad.size(), 0);
 	}
 
 	public static <T> List<List<T>> splitCollection(Collection<T> collection, int size) {

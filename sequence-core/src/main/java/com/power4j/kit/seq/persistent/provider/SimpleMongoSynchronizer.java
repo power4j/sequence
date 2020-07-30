@@ -19,7 +19,13 @@ package com.power4j.kit.seq.persistent.provider;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.*;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.FindOneAndUpdateOptions;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.ReturnDocument;
+import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
 import com.power4j.kit.seq.persistent.AddState;
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
@@ -36,7 +42,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * @author CJ (power4j@outlook.com)
  * @date 2020/7/17
- * @since 1.0
+ * @since 1.2
  */
 @Slf4j
 @AllArgsConstructor

@@ -19,6 +19,7 @@ package com.power4j.kit.seq.persistent.provider;
 import com.power4j.kit.seq.TestUtil;
 import com.power4j.kit.seq.persistent.AddState;
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -35,6 +36,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @date 2020/7/3
  * @since 1.0
  */
+@Slf4j
 public abstract class SynchronizerTestCase {
 
 	protected abstract SeqSynchronizer getSeqSynchronizer();
@@ -46,7 +48,7 @@ public abstract class SynchronizerTestCase {
 	public void simpleTest() {
 		final SeqSynchronizer seqSynchronizer = getSeqSynchronizer();
 		final String seqName = "power4j";
-		final String partition = TestUtil.StrNow();
+		final String partition = TestUtil.strNow();
 		final long initValue = 1000L;
 		final long newValue = 1L;
 		seqSynchronizer.tryCreate(seqName, partition, initValue);
@@ -74,7 +76,7 @@ public abstract class SynchronizerTestCase {
 	public void multipleThreadUpdateTest() {
 		final SeqSynchronizer seqSynchronizer = getSeqSynchronizer();
 		final String seqName = "power4j";
-		final String partition = TestUtil.StrNow();
+		final String partition = TestUtil.strNow();
 		final long initValue = 1L;
 		final long finalValue = 1000L;
 		final int delta = 1;
@@ -92,8 +94,8 @@ public abstract class SynchronizerTestCase {
 				long current;
 				int loop = 0;
 				while ((current = seqSynchronizer.getNextValue(seqName, partition).get()) != finalValue) {
-					if (loop % 1000 == 0) {
-						System.out.println(String.format("[thread %s] loop %08d, current = %08d",
+					if (loop % 100 == 0) {
+						log.info(String.format("[thread %s] loop %08d, current = %08d",
 								Thread.currentThread().getName(), loop, current));
 					}
 					++loop;
@@ -115,10 +117,10 @@ public abstract class SynchronizerTestCase {
 		}
 		TestUtil.wait(threadDone);
 		long lastValue = seqSynchronizer.getNextValue(seqName, partition).get();
-		System.out.println(String.format("lastValue value = %d , update count = %d", lastValue, updateCount.get()));
+		log.info(String.format("lastValue value = %d , update count = %d", lastValue, updateCount.get()));
 
-		System.out.println(String.format("synchronizer query count = %d , update count = %d",
-				seqSynchronizer.getQueryCounter(), seqSynchronizer.getUpdateCounter()));
+		log.info(String.format("synchronizer query count = %d , update count = %d", seqSynchronizer.getQueryCounter(),
+				seqSynchronizer.getUpdateCounter()));
 
 		Assert.assertTrue(lastValue == finalValue);
 	}
@@ -130,7 +132,7 @@ public abstract class SynchronizerTestCase {
 	public void multipleThreadAddTest() {
 		final SeqSynchronizer seqSynchronizer = getSeqSynchronizer();
 		final String seqName = "power4j";
-		final String partition = TestUtil.StrNow();
+		final String partition = TestUtil.strNow();
 		final long initValue = 1L;
 		final long finalValue = 10000L;
 		final int delta = 1;
@@ -151,7 +153,7 @@ public abstract class SynchronizerTestCase {
 					addState = seqSynchronizer.tryAddAndGet(seqName, partition, delta, 3);
 					opCount.addAndGet(addState.getTotalOps());
 					if (loop % 200 == 0) {
-						System.out.println(String.format("[thread %s] loop %08d, from %08d to %08d",
+						log.info(String.format("[thread %s] loop %08d, from %08d to %08d",
 								Thread.currentThread().getName(), loop, addState.getPrevious(), addState.getCurrent()));
 						Assert.assertTrue(
 								!addState.isSuccess() || addState.getCurrent() - addState.getPrevious() == delta);
@@ -160,7 +162,7 @@ public abstract class SynchronizerTestCase {
 				}
 				while (!addState.isSuccess() || addState.getCurrent() < finalValue);
 				threadDone.countDown();
-				System.out.println(String.format("[thread %s] [done] current = %08d", Thread.currentThread().getName(),
+				log.info(String.format("[thread %s] [done] current = %08d", Thread.currentThread().getName(),
 						addState.getCurrent()));
 			}, executorService).exceptionally(e -> {
 				threadDone.countDown();
@@ -171,10 +173,10 @@ public abstract class SynchronizerTestCase {
 
 		TestUtil.wait(threadDone);
 		long lastValue = seqSynchronizer.getNextValue(seqName, partition).get();
-		System.out.println(String.format("lastValue value = %d , operate count = %d", lastValue, opCount.get()));
+		log.info(String.format("lastValue value = %d , operate count = %d", lastValue, opCount.get()));
 
-		System.out.println(String.format("synchronizer query count = %d , update count = %d",
-				seqSynchronizer.getQueryCounter(), seqSynchronizer.getUpdateCounter()));
+		log.info(String.format("synchronizer query count = %d , update count = %d", seqSynchronizer.getQueryCounter(),
+				seqSynchronizer.getUpdateCounter()));
 
 		Assert.assertTrue(lastValue == finalValue + threads - 1);
 	}
