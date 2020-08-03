@@ -44,8 +44,8 @@ public abstract class SeqHolderTestCase {
 	@Test
 	public void getValueTest() {
 		final SeqHolder holder = getSeqHolder();
-		final int threads = 8;
-		final int loops = 100000;
+		final int threads = 4;
+		final int loops = 20000;
 		CountDownLatch threadReady = new CountDownLatch(threads);
 		CountDownLatch threadDone = new CountDownLatch(threads);
 		AtomicLong opCount = new AtomicLong();

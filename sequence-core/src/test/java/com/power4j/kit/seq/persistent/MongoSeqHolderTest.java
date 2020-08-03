@@ -33,15 +33,13 @@ public class MongoSeqHolderTest extends SeqHolderTestCase {
 
 	public final static String DB_NAME = "seq_test";
 
-	public final static String COL_NAME = "holder_test";
+	public final static String COL_NAME = "power4j_" + MongoSeqHolderTest.class.getSimpleName();
 
-	public final String seqName = "power4j_" + MongoSeqHolderTest.class.getSimpleName();
+	public final String seqName = "holder_test";
 
 	public final String partition = TestUtil.strNow();
 
 	private MongoClient mongoClient;
-
-	private SimpleMongoSynchronizer seqSynchronizer;
 
 	private SeqHolder holder;
 
