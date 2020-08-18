@@ -37,10 +37,8 @@ import java.util.concurrent.TimeUnit;
  * @date 2020/7/4
  * @since 1.0
  */
+@Fork(1)
 @State(Scope.Benchmark)
-@Threads(Threads.MAX)
-@Fork(value = 1, jvmArgsAppend = { "-server", "-Xms32m", "-Xmx128m", "-Xmn64m", "-XX:CMSInitiatingOccupancyFraction=82",
-		"-Xss256k", "-XX:LargePageSizeInBytes=64m" })
 @BenchmarkMode(Mode.Throughput)
 @Warmup(iterations = 1, time = 3)
 @Measurement(iterations = 3, time = 10)
@@ -69,7 +67,14 @@ public class MySqlSeqHolderBench {
 	}
 
 	@Benchmark
-	public void getSeq(Blackhole bh) {
+	@Threads(1)
+	public void testSingleThread(Blackhole bh) {
+		bh.consume(seqHolder.next());
+	}
+
+	@Benchmark
+	@Threads(4)
+	public void test4Threads(Blackhole bh) {
 		bh.consume(seqHolder.next());
 	}
 
