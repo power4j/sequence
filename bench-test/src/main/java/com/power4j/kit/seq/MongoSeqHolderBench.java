@@ -36,9 +36,6 @@ import java.util.concurrent.TimeUnit;
  * @since 1.0
  */
 @State(Scope.Benchmark)
-@Threads(Threads.MAX)
-@Fork(value = 1, jvmArgsAppend = { "-server", "-Xms32m", "-Xmx128m", "-Xmn64m", "-XX:CMSInitiatingOccupancyFraction=82",
-		"-Xss256k", "-XX:LargePageSizeInBytes=64m" })
 @BenchmarkMode(Mode.Throughput)
 @Warmup(iterations = 1, time = 3)
 @Measurement(iterations = 3, time = 10)
@@ -65,7 +62,14 @@ public class MongoSeqHolderBench {
 	}
 
 	@Benchmark
-	public void getSeq(Blackhole bh) {
+	@Threads(1)
+	public void testSingleThread(Blackhole bh) {
+		bh.consume(seqHolder.next());
+	}
+
+	@Benchmark
+	@Threads(4)
+	public void test4Thread(Blackhole bh) {
 		bh.consume(seqHolder.next());
 	}
 
