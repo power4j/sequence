@@ -35,6 +35,7 @@ import java.util.concurrent.TimeUnit;
  * @date 2020/7/29
  * @since 1.3
  */
+@Fork(1)
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.Throughput)
 @Warmup(iterations = 1, time = 3)
@@ -71,7 +72,7 @@ public class PostgreSqlSeqHolderBench {
 
 	@Benchmark
 	@Threads(4)
-	public void test4Thread(Blackhole bh) {
+	public void test4Threads(Blackhole bh) {
 		bh.consume(seqHolder.next());
 	}
 

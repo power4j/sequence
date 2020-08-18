@@ -97,24 +97,7 @@ public class SequenceExampleApplication {
 ## 性能测试结果
 > 测试环境用的Redis,MySQL等外部服务都是默认安装，没有调整参数。
 
-测试环境一: 腾讯云服务器1核(2.6G)2G `CentOS7.6`
-```shell
-# Detecting actual CPU count: 1 detected
-# JMH version: 1.23
-# VM version: JDK 1.8.0_252, OpenJDK 64-Bit Server VM, 25.252-b09
-# VM invoker: /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.252.b09-2.el7_8.x86_64/jre/bin/java
-# VM options: -server -Xms32m -Xmx128m -Xmn64m -XX:CMSInitiatingOccupancyFraction=82 -Xss256k -XX:LargePageSizeInBytes=64m
-
-
-Benchmark                         Mode  Cnt         Score          Error  Units
-LettuceSeqHolderBench.getSeq     thrpt    3   3814342.579 ±  1458928.749  ops/s
-LongSeqPoolBench.getSeq          thrpt    3  77560480.796 ± 72152367.393  ops/s
-MongoSeqHolderBench.getSeq       thrpt    3   1363826.330 ±  8857057.928  ops/s
-MySqlSeqHolderBench.getSeq       thrpt    3    112325.398 ±    67063.696  ops/s
-PostgreSqlSeqHolderBench.getSeq  thrpt    3    605173.501 ±  1355092.903  ops/s
-
-```
-> OPS:  裸奔 7500万 redis: 380万 MySQL: 11万 MongoDB 130万  PostgreSQL 60万
+![bench](docs/assets/img/bench.png)
 
 - 分数看看就好,纯跑分没什么意义,只能作为一个性能参考。
 - 需要自己测试，已经为你写好测试脚本,见[run-bench.sh](bench-test/run-bench.sh)

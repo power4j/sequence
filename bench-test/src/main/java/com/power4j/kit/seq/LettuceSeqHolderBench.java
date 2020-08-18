@@ -36,6 +36,7 @@ import java.util.concurrent.TimeUnit;
  * @date 2020/7/12
  * @since 1.1
  */
+@Fork(1)
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.Throughput)
 @Warmup(iterations = 1, time = 3)
@@ -72,7 +73,7 @@ public class LettuceSeqHolderBench {
 
 	@Benchmark
 	@Threads(4)
-	public void test4Thread(Blackhole bh) {
+	public void test4Threads(Blackhole bh) {
 		bh.consume(seqHolder.next());
 	}
 
