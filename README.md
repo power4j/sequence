@@ -94,13 +94,14 @@ public class SequenceExampleApplication {
 }
 ```
 
-## 性能测试结果
+## 性能测试
+
+<img src="docs/assets/img/bench.png"/>
+
 > 测试环境用的Redis,MySQL等外部服务都是默认安装，没有调整参数。
+>
+> 如果需要自己测试，已经为你写好测试脚本,见[run-bench.sh](bench-test/run-bench.sh)
 
-![bench](docs/assets/img/bench.png)
-
-- 分数看看就好,纯跑分没什么意义,只能作为一个性能参考。
-- 需要自己测试，已经为你写好测试脚本,见[run-bench.sh](bench-test/run-bench.sh)
 
 ## 效果演示
 
