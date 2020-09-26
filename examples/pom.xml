@@ -34,6 +34,7 @@
     <module>jdbc-example</module>
     <module>redis-example</module>
     <module>mongo-example</module>
+    <module>actuator-example</module>
   </modules>
 
 </project>
