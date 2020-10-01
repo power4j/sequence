@@ -30,20 +30,22 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration(proxyBeanMethods = false)
 public class EndpointAutoConfiguration {
+
 	@Autowired
 	private ApplicationContext applicationContext;
 
 	@Bean
 	@ConditionalOnMissingBean(SequenceEndpoint.class)
 	@ConditionalOnAvailableEndpoint(endpoint = SequenceEndpoint.class)
-	public SequenceEndpoint sequenceEndpoint(){
+	public SequenceEndpoint sequenceEndpoint() {
 		return new SequenceEndpoint(applicationContext);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean(SeqSynchronizerEndpoint.class)
 	@ConditionalOnAvailableEndpoint(endpoint = SeqSynchronizerEndpoint.class)
-	public SeqSynchronizerEndpoint seqSynchronizerEndpoint(){
+	public SeqSynchronizerEndpoint seqSynchronizerEndpoint() {
 		return new SeqSynchronizerEndpoint(applicationContext);
 	}
+
 }

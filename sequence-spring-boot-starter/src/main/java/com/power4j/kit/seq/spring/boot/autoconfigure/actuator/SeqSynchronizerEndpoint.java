@@ -40,7 +40,7 @@ public class SeqSynchronizerEndpoint implements SmartInitializingSingleton {
 
 	private final ApplicationContext applicationContext;
 
-	private Map<String,SeqSynchronizer> synchronizerBeanMap;
+	private Map<String, SeqSynchronizer> synchronizerBeanMap;
 
 	public SeqSynchronizerEndpoint(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
@@ -79,5 +79,7 @@ public class SeqSynchronizerEndpoint implements SmartInitializingSingleton {
 		private Long queryCount;
 
 		private Long updateCount;
+
 	}
+
 }
