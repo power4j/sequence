@@ -39,4 +39,11 @@ public class EndpointAutoConfiguration {
 	public SequenceEndpoint sequenceEndpoint(){
 		return new SequenceEndpoint(applicationContext);
 	}
+
+	@Bean
+	@ConditionalOnMissingBean(SeqSynchronizerEndpoint.class)
+	@ConditionalOnAvailableEndpoint(endpoint = SeqSynchronizerEndpoint.class)
+	public SeqSynchronizerEndpoint seqSynchronizerEndpoint(){
+		return new SeqSynchronizerEndpoint(applicationContext);
+	}
 }

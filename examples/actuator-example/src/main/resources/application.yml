@@ -14,7 +14,9 @@ management:
   endpoints:
     web:
       exposure:
-        include: sequence
+        include:
+          - sequence
+          - sequence-synchronizer
 ---
 spring:
   profiles: mysql
