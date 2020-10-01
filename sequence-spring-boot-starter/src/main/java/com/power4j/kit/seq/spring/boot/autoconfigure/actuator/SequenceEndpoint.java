@@ -48,7 +48,7 @@ public class SequenceEndpoint implements SmartInitializingSingleton {
 	@Override
 	public void afterSingletonsInstantiated() {
 		sequenceInfoList = applicationContext.getBeansOfType(Sequence.class).entrySet().stream()
-				.map(kv -> new SequenceInfo(kv.getKey(), kv.getValue().getName(), kv.getValue().getClass().getName()))
+				.map(kv -> new SequenceInfo(kv.getKey(), kv.getValue().getClass().getName(), kv.getValue().getName()))
 				.collect(Collectors.toList());
 	}
 
@@ -63,9 +63,9 @@ public class SequenceEndpoint implements SmartInitializingSingleton {
 
 		private final String beanName;
 
-		private final String seqName;
-
 		private final String className;
+
+		private final String seqName;
 
 	}
 
