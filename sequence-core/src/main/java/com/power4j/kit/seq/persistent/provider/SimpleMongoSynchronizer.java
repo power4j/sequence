@@ -16,16 +16,11 @@
 
 package com.power4j.kit.seq.persistent.provider;
 
+import com.mongodb.MongoWriteException;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.FindOneAndUpdateOptions;
-import com.mongodb.client.model.IndexOptions;
-import com.mongodb.client.model.Indexes;
-import com.mongodb.client.model.ReturnDocument;
-import com.mongodb.client.model.UpdateOptions;
-import com.mongodb.client.model.Updates;
+import com.mongodb.client.model.*;
 import com.mongodb.client.result.UpdateResult;
 import com.power4j.kit.seq.persistent.AddState;
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
@@ -96,12 +91,20 @@ public class SimpleMongoSynchronizer implements SeqSynchronizer {
 	@Override
 	public boolean tryCreate(String name, String partition, long nextValue) {
 		MongoCollection<Document> col = ensureCollection();
-		Bson query = getSeqSelector(name, partition);
-		Bson op = Updates.combine(Updates.setOnInsert(DocKeys.KEY_SEQ_VALUE, nextValue),
-				Updates.setOnInsert(DocKeys.KEY_SEQ_CREATE_AT, LocalDateTime.now()),
-				Updates.setOnInsert(DocKeys.KEY_SEQ_UPDATE_AT, null));
-		UpdateResult result = col.updateOne(query, op, new UpdateOptions().upsert(true));
-		return result.getUpsertedId() != null;
+		Document document = new Document();
+		document.put(DocKeys.KEY_SEQ_NAME, name);
+		document.put(DocKeys.KEY_SEQ_PARTITION, partition);
+		document.put(DocKeys.KEY_SEQ_VALUE, nextValue);
+		document.put(DocKeys.KEY_SEQ_CREATE_AT, LocalDateTime.now());
+		document.put(DocKeys.KEY_SEQ_UPDATE_AT, null);
+		try {
+			col.insertOne(document);
+			return true;
+		}
+		catch (MongoWriteException writeException) {
+			log.debug("Ignore Insert error,{}", writeException.getMessage());
+			return false;
+		}
 	}
 
 	@Override
