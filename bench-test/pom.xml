@@ -29,7 +29,6 @@
   <description>performance test</description>
 
   <properties>
-    <maven.deploy.skip>true</maven.deploy.skip>
     <jmh.version>1.23</jmh.version>
     <!-- Name of the benchmark Uber-JAR to generate -->
     <uberjar.name>benchmarks</uberjar.name>
