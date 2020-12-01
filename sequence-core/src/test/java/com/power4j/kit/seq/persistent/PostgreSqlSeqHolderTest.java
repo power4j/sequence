@@ -21,7 +21,6 @@ import com.power4j.kit.seq.core.SeqFormatter;
 import com.power4j.kit.seq.persistent.provider.PostgreSqlSynchronizer;
 import com.power4j.kit.seq.persistent.provider.TestServices;
 import org.junit.After;
-import org.junit.Before;
 
 /**
  * @author CJ (power4j@outlook.com)
@@ -38,14 +37,12 @@ public class PostgreSqlSeqHolderTest extends SeqHolderTestCase {
 
 	private PostgreSqlSynchronizer seqSynchronizer;
 
-	private SeqHolder holder;
-
-	@Before
-	public void setUp() {
+	public SeqHolder createSeqHolder() {
 		seqSynchronizer = new PostgreSqlSynchronizer(SEQ_TABLE, TestServices.getPostgreSqlDataSource());
 		seqSynchronizer.init();
-		holder = new SeqHolder(seqSynchronizer, seqName, partition, 1L, 1000, SeqFormatter.DEFAULT_FORMAT);
+		SeqHolder holder = new SeqHolder(seqSynchronizer, seqName, partition, 1L, 1000, SeqFormatter.DEFAULT_FORMAT);
 		holder.prepare();
+		return holder;
 	}
 
 	@After
@@ -57,7 +54,7 @@ public class PostgreSqlSeqHolderTest extends SeqHolderTestCase {
 
 	@Override
 	protected SeqHolder getSeqHolder() {
-		return holder;
+		return createSeqHolder();
 	}
 
 }

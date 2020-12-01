@@ -34,10 +34,15 @@ public class MySqlSynchronizerTest extends SynchronizerTestCase {
 
 	private MySqlSynchronizer mySqlSynchronizer;
 
+	private MySqlSynchronizer createSeqSynchronizer() {
+		MySqlSynchronizer sqlSynchronizer = new MySqlSynchronizer(SEQ_TABLE, TestServices.getMySqlDataSource());
+		sqlSynchronizer.init();
+		return sqlSynchronizer;
+	}
+
 	@Before
 	public void setUp() {
-		mySqlSynchronizer = new MySqlSynchronizer(SEQ_TABLE, TestServices.getMySqlDataSource());
-		mySqlSynchronizer.init();
+		mySqlSynchronizer = createSeqSynchronizer();
 	}
 
 	@After

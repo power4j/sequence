@@ -22,7 +22,6 @@ import com.power4j.kit.seq.core.SeqFormatter;
 import com.power4j.kit.seq.persistent.provider.SimpleMongoSynchronizer;
 import com.power4j.kit.seq.persistent.provider.TestServices;
 import org.junit.After;
-import org.junit.Before;
 
 /**
  * @author CJ (power4j@outlook.com)
@@ -41,15 +40,13 @@ public class MongoSeqHolderTest extends SeqHolderTestCase {
 
 	private MongoClient mongoClient;
 
-	private SeqHolder holder;
-
-	@Before
-	public void setUp() {
+	public SeqHolder createSeqHolder() {
 		mongoClient = TestServices.getMongoClient();
 		SimpleMongoSynchronizer seqSynchronizer = new SimpleMongoSynchronizer(DB_NAME, COL_NAME, mongoClient);
 		seqSynchronizer.init();
-		holder = new SeqHolder(seqSynchronizer, seqName, partition, 1L, 1000, SeqFormatter.DEFAULT_FORMAT);
+		SeqHolder holder = new SeqHolder(seqSynchronizer, seqName, partition, 1L, 1000, SeqFormatter.DEFAULT_FORMAT);
 		holder.prepare();
+		return holder;
 	}
 
 	@After
@@ -61,7 +58,7 @@ public class MongoSeqHolderTest extends SeqHolderTestCase {
 
 	@Override
 	protected SeqHolder getSeqHolder() {
-		return holder;
+		return createSeqHolder();
 	}
 
 }

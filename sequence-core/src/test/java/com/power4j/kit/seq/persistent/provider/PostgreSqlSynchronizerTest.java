@@ -17,31 +17,22 @@
 package com.power4j.kit.seq.persistent.provider;
 
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
-import org.junit.After;
-import org.junit.Before;
 
 public class PostgreSqlSynchronizerTest extends SynchronizerTestCase {
 
 	public final static String SEQ_TABLE = "tb_seq";
 
-	private PostgreSqlSynchronizer postgreSqlSynchronizer;
+	private PostgreSqlSynchronizer createSeqSynchronizer() {
 
-	@Before
-	public void setUp() {
-		postgreSqlSynchronizer = new PostgreSqlSynchronizer(SEQ_TABLE, TestServices.getPostgreSqlDataSource());
+		PostgreSqlSynchronizer postgreSqlSynchronizer = new PostgreSqlSynchronizer(SEQ_TABLE,
+				TestServices.getPostgreSqlDataSource());
 		postgreSqlSynchronizer.init();
-	}
-
-	@After
-	public void tearDown() {
-		if (postgreSqlSynchronizer != null) {
-			postgreSqlSynchronizer.dropTable();
-		}
+		return postgreSqlSynchronizer;
 	}
 
 	@Override
 	protected SeqSynchronizer getSeqSynchronizer() {
-		return postgreSqlSynchronizer;
+		return createSeqSynchronizer();
 	}
 
 }

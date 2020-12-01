@@ -19,7 +19,6 @@ package com.power4j.kit.seq.persistent.provider;
 import com.mongodb.client.MongoClient;
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
 import org.junit.After;
-import org.junit.Before;
 
 public class SimpleMongoSynchronizerTest extends SynchronizerTestCase {
 
@@ -29,20 +28,16 @@ public class SimpleMongoSynchronizerTest extends SynchronizerTestCase {
 
 	private MongoClient mongoClient;
 
-	private SimpleMongoSynchronizer simpleMongoSynchronizer;
+	private SimpleMongoSynchronizer createSeqSynchronizer() {
 
-	@Before
-	public void setUp() {
 		mongoClient = TestServices.getMongoClient();
-		simpleMongoSynchronizer = new SimpleMongoSynchronizer(DB_NAME, COLL_NAME, mongoClient);
+		SimpleMongoSynchronizer simpleMongoSynchronizer = new SimpleMongoSynchronizer(DB_NAME, COLL_NAME, mongoClient);
 		simpleMongoSynchronizer.init();
+		return simpleMongoSynchronizer;
 	}
 
 	@After
 	public void tearDown() {
-		if (simpleMongoSynchronizer != null) {
-			simpleMongoSynchronizer.dropCollection();
-		}
 		if (mongoClient != null) {
 			mongoClient.close();
 		}
@@ -50,7 +45,7 @@ public class SimpleMongoSynchronizerTest extends SynchronizerTestCase {
 
 	@Override
 	protected SeqSynchronizer getSeqSynchronizer() {
-		return simpleMongoSynchronizer;
+		return createSeqSynchronizer();
 	}
 
 }
