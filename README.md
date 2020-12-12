@@ -15,7 +15,8 @@
   - 线程安全
   - 适用性好
   - 配置简单、容易集成
-
+  
+  
 ## 项目说明
 
 - ***JDK 版本要求: `JDK8+`*** 
@@ -137,6 +138,13 @@ public class SequenceExampleApplication {
 
  1. 参考[`MySqlSynchronizer`](sequence-core/src/main/java/com/power4j/kit/seq/persistent/provider/MySqlSynchronizer.java)的实现方式，实现某个特定数据库后端的支持
  2. 参考[`MySqlSynchronizerTest`](sequence-core/src/test/java/com/power4j/kit/seq/persistent/provider/MySqlSynchronizerTest.java) 编写单元测试，完成自测。如果你的代码能跑通测试，基本上应该没有严重bug
+
+
+
+## Special Thanks
+
+- [JetBrains Developer Toolbox](https://www.jetbrains.com/?from=sequence)
+
 
  ## 联系方式
  
