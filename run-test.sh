@@ -10,4 +10,4 @@ export TEST_REDIS_URI="redis://127.0.0.1:6379"
 export TEST_MONGO_URI="mongodb://root:root@127.0.0.1:27017"
 
 
-mvn test -DskipTests=false -B -P 'aliyun-repo,!oss-release,!travis-ci'
+mvn test -DskipTests=false -B -P '!oss-release,!travis-ci'
