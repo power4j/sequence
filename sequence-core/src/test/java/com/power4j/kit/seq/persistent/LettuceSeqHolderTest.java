@@ -22,7 +22,6 @@ import com.power4j.kit.seq.persistent.provider.SimpleLettuceSynchronizer;
 import com.power4j.kit.seq.persistent.provider.TestServices;
 import io.lettuce.core.RedisClient;
 import org.junit.After;
-import org.junit.Before;
 
 public class LettuceSeqHolderTest extends SeqHolderTestCase {
 
@@ -34,17 +33,13 @@ public class LettuceSeqHolderTest extends SeqHolderTestCase {
 
 	private RedisClient redisClient;
 
-	private SimpleLettuceSynchronizer seqSynchronizer;
-
-	private SeqHolder holder;
-
-	@Before
-	public void setUp() {
+	public SeqHolder createSeqHolder() {
 		redisClient = TestServices.getRedisClient();
 		SimpleLettuceSynchronizer seqSynchronizer = new SimpleLettuceSynchronizer(SEQ_CACHE_NAME, redisClient);
 		seqSynchronizer.init();
-		holder = new SeqHolder(seqSynchronizer, seqName, partition, 1L, 1000, SeqFormatter.DEFAULT_FORMAT);
+		SeqHolder holder = new SeqHolder(seqSynchronizer, seqName, partition, 1L, 1000, SeqFormatter.DEFAULT_FORMAT);
 		holder.prepare();
+		return holder;
 	}
 
 	@After
@@ -56,7 +51,7 @@ public class LettuceSeqHolderTest extends SeqHolderTestCase {
 
 	@Override
 	protected SeqHolder getSeqHolder() {
-		return holder;
+		return createSeqHolder();
 	}
 
 }

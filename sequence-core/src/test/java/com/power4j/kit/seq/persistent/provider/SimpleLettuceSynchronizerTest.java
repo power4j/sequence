@@ -19,7 +19,6 @@ package com.power4j.kit.seq.persistent.provider;
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
 import io.lettuce.core.RedisClient;
 import org.junit.After;
-import org.junit.Before;
 
 public class SimpleLettuceSynchronizerTest extends SynchronizerTestCase {
 
@@ -27,20 +26,17 @@ public class SimpleLettuceSynchronizerTest extends SynchronizerTestCase {
 
 	private RedisClient redisClient;
 
-	private SimpleLettuceSynchronizer simpleLettuceSynchronizer;
+	private SimpleLettuceSynchronizer createSeqSynchronizer() {
 
-	@Before
-	public void setUp() {
 		redisClient = TestServices.getRedisClient();
-		simpleLettuceSynchronizer = new SimpleLettuceSynchronizer(SEQ_CACHE_NAME, redisClient);
+		SimpleLettuceSynchronizer simpleLettuceSynchronizer = new SimpleLettuceSynchronizer(SEQ_CACHE_NAME,
+				redisClient);
 		simpleLettuceSynchronizer.init();
+		return simpleLettuceSynchronizer;
 	}
 
 	@After
 	public void tearDown() {
-		if (simpleLettuceSynchronizer != null) {
-			simpleLettuceSynchronizer.removeCache();
-		}
 		if (redisClient != null) {
 			redisClient.shutdown();
 		}
@@ -48,7 +44,7 @@ public class SimpleLettuceSynchronizerTest extends SynchronizerTestCase {
 
 	@Override
 	protected SeqSynchronizer getSeqSynchronizer() {
-		return simpleLettuceSynchronizer;
+		return createSeqSynchronizer();
 	}
 
 }

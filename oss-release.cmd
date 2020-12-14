@@ -1,1 +1,1 @@
-mvn clean deploy -DskipTests=true -P oss-release,aliyun-repo
+mvn clean deploy -DskipTests=true -P oss-release

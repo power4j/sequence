@@ -21,7 +21,6 @@ import com.power4j.kit.seq.core.SeqFormatter;
 import com.power4j.kit.seq.persistent.provider.MySqlSynchronizer;
 import com.power4j.kit.seq.persistent.provider.TestServices;
 import org.junit.After;
-import org.junit.Before;
 
 public class MySqlSeqHolderTest extends SeqHolderTestCase {
 
@@ -33,14 +32,12 @@ public class MySqlSeqHolderTest extends SeqHolderTestCase {
 
 	private MySqlSynchronizer seqSynchronizer;
 
-	private SeqHolder holder;
-
-	@Before
-	public void setUp() {
+	public SeqHolder createSeqHolder() {
 		seqSynchronizer = new MySqlSynchronizer(SEQ_TABLE, TestServices.getMySqlDataSource());
 		seqSynchronizer.init();
-		holder = new SeqHolder(seqSynchronizer, seqName, partition, 1L, 1000, SeqFormatter.DEFAULT_FORMAT);
+		SeqHolder holder = new SeqHolder(seqSynchronizer, seqName, partition, 1L, 1000, SeqFormatter.DEFAULT_FORMAT);
 		holder.prepare();
+		return holder;
 	}
 
 	@After
@@ -52,7 +49,7 @@ public class MySqlSeqHolderTest extends SeqHolderTestCase {
 
 	@Override
 	protected SeqHolder getSeqHolder() {
-		return holder;
+		return createSeqHolder();
 	}
 
 }
