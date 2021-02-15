@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Endpoint for {@code Sequence}
+ * Endpoint for {@link Sequence}
  *
  * @author CJ (power4j@outlook.com)
  * @date 2020/9/26
