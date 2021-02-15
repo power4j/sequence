@@ -24,6 +24,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
+ * 监控端点自动配置
+ *
  * @author CJ (power4j@outlook.com)
  * @date 2020/9/26
  * @since 1.4

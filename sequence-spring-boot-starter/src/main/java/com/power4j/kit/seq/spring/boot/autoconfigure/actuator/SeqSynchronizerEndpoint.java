@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Endpoint for {@code SeqSynchronizer}
+ * Endpoint for {@link SeqSynchronizer}
  *
  * @author CJ (power4j@outlook.com)
  * @date 2020/9/26
@@ -76,9 +76,9 @@ public class SeqSynchronizerEndpoint implements SmartInitializingSingleton {
 
 		private final String className;
 
-		private Long queryCount;
+		private final Long queryCount;
 
-		private Long updateCount;
+		private final Long updateCount;
 
 	}
 

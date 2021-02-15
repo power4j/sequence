@@ -30,6 +30,8 @@ import org.springframework.context.annotation.Configuration;
 import javax.sql.DataSource;
 
 /**
+ * JDBC 序号同步器配置
+ *
  * @author CJ (power4j@outlook.com)
  * @date 2020/7/7
  * @since 1.0
