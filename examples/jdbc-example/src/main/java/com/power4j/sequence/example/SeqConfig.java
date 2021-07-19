@@ -18,7 +18,8 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 @Configuration
 public class SeqConfig {
-	private final static SeqFormatter MY_FORMATTER = (seqName, partition, value) ->  partition + "批次,第"+value+"号";
+
+	private final static SeqFormatter MY_FORMATTER = (seqName, partition, value) -> partition + "批次,第" + value + "号";
 
 	@Bean
 	public Sequence<Long> sequence(SequenceProperties sequenceProperties, SeqSynchronizer seqSynchronizer) {
