@@ -95,6 +95,10 @@ public class SequenceExampleApplication {
 }
 ```
 
+## 自定义配置
+
+例子: [SeqConfig.java](examples/jdbc-example/src/main/java/com/power4j/sequence/example/SeqConfig.java)
+
 ## 性能测试
 
 <img src="docs/assets/img/bench.png"/>
