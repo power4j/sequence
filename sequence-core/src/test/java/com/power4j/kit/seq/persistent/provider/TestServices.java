@@ -43,9 +43,9 @@ public class TestServices {
 	private final static String DEFAULT_POSTGRESQL_JDBC_URL = "jdbc:postgresql://127.0.0.1:5432/test?ssl=false";
 
 	/**
-	 * H2 JDBC连接字符串,内存模式
+	 * jdbc:h2://host:port:database;[properties];
 	 */
-	private final static String DEFAULT_H2_JDBC_URL = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1";
+	private final static String DEFAULT_H2_JDBC_URL = "jdbc:h2:mem:test;MODE=MYSQL;DB_CLOSE_DELAY=-1";
 
 	/**
 	 * redis://[password@]host [: port][/database]
