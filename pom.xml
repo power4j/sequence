@@ -63,7 +63,6 @@
     <spring-javaformat.plugin.version>0.0.27</spring-javaformat.plugin.version>
     <git.commit.plugin.version>4.0.5</git.commit.plugin.version>
     <spring-boot.version>2.4.2</spring-boot.version>
-    <hutool.version>5.3.1</hutool.version>
   </properties>
 
   <dependencies>

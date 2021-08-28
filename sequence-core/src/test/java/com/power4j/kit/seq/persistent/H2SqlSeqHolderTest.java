@@ -1,0 +1,61 @@
+/*
+ * Copyright 2020 ChenJun (power4j@outlook.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.power4j.kit.seq.persistent;
+
+import com.power4j.kit.seq.TestUtil;
+import com.power4j.kit.seq.core.SeqFormatter;
+import com.power4j.kit.seq.persistent.provider.H2Synchronizer;
+import com.power4j.kit.seq.persistent.provider.PostgreSqlSynchronizer;
+import com.power4j.kit.seq.persistent.provider.TestServices;
+import org.junit.After;
+
+/**
+ * @author lishangbu
+ * @date 2021/8/28
+ * @since 1.5.0
+ */
+public class H2SqlSeqHolderTest extends SeqHolderTestCase {
+
+	public final static String SEQ_TABLE = "tb_seq";
+
+	public final String seqName = "power4j_" + H2SqlSeqHolderTest.class.getSimpleName();
+
+	public final String partition = TestUtil.strNow();
+
+	private H2Synchronizer seqSynchronizer;
+
+	public SeqHolder createSeqHolder() {
+		seqSynchronizer = new H2Synchronizer(SEQ_TABLE, TestServices.getH2DataSource());
+		seqSynchronizer.init();
+		SeqHolder holder = new SeqHolder(seqSynchronizer, seqName, partition, 1L, 1000, SeqFormatter.DEFAULT_FORMAT);
+		holder.prepare();
+		return holder;
+	}
+
+	@After
+	public void tearDown() {
+		if (seqSynchronizer != null) {
+			seqSynchronizer.dropTable();
+		}
+	}
+
+	@Override
+	protected SeqHolder getSeqHolder() {
+		return createSeqHolder();
+	}
+
+}

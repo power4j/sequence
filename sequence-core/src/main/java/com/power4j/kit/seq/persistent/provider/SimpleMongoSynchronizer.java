@@ -107,7 +107,7 @@ public class SimpleMongoSynchronizer implements SeqSynchronizer {
 			return true;
 		}
 		catch (MongoWriteException writeException) {
-			log.debug("Ignore Insert error,{}", writeException.getMessage());
+			log.error("Ignore Insert error,{}", writeException.getMessage());
 			return false;
 		}
 	}

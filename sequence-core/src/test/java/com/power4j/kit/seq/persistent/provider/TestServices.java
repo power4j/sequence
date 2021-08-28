@@ -43,6 +43,11 @@ public class TestServices {
 	private final static String DEFAULT_POSTGRESQL_JDBC_URL = "jdbc:postgresql://127.0.0.1:5432/test?ssl=false";
 
 	/**
+	 * jdbc:h2://host:port:database;[properties];
+	 */
+	private final static String DEFAULT_H2_JDBC_URL = "jdbc:h2:mem:test;MODE=MYSQL;DB_CLOSE_DELAY=-1";
+
+	/**
 	 * redis://[password@]host [: port][/database]
 	 */
 	public final static String DEFAULT_REDIS_URI = "redis://127.0.0.1:6379";
@@ -67,6 +72,15 @@ public class TestServices {
 		config.setJdbcUrl(jdbcUrl);
 		config.setUsername(EnvUtil.getStr("TEST_POSTGRESQL_USER", "postgres"));
 		config.setPassword(EnvUtil.getStr("TEST_POSTGRESQL_PWD", ""));
+		return new HikariDataSource(config);
+	}
+
+	public static DataSource getH2DataSource() {
+		String jdbcUrl = EnvUtil.getStr("TEST_H2_URL", DEFAULT_H2_JDBC_URL);
+		HikariConfig config = new HikariConfig();
+		config.setJdbcUrl(jdbcUrl);
+		config.setUsername(EnvUtil.getStr("TEST_H2_USER", "sa"));
+		config.setPassword(EnvUtil.getStr("TEST_H2_PWD", ""));
 		return new HikariDataSource(config);
 	}
 
