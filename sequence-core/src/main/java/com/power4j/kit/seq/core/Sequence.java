@@ -54,7 +54,7 @@ public interface Sequence<T> {
 	 * @throws SeqException 无法获得序号返回 null
 	 */
 	default Optional<String> nextStrOpt() {
-		return nextOpt().map(v -> v.toString());
+		return nextOpt().map(Object::toString);
 	}
 
 	/**

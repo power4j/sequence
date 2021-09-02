@@ -68,7 +68,7 @@ public class LongSeqPool implements SeqPool<Long, LongSeqPool> {
 	 * @param start 起始值，包含
 	 * @param size 数量
 	 * @param reRoll 是否允许滚动
-	 * @return
+	 * @return LongSeqPool
 	 */
 	public static LongSeqPool forSize(String name, long start, int size, boolean reRoll) {
 		return new LongSeqPool(name, start, start + size - ONE, reRoll);
@@ -80,10 +80,21 @@ public class LongSeqPool implements SeqPool<Long, LongSeqPool> {
 	 * @param min 起始值，包含
 	 * @param max end 结束值，包含
 	 * @param reRoll 是否允许滚动
-	 * @return
+	 * @return LongSeqPool
 	 */
 	public static LongSeqPool forRange(String name, long min, long max, boolean reRoll) {
 		return new LongSeqPool(name, min, max, reRoll);
+	}
+
+	/**
+	 * 根据起始值创建,最大值为 Long.MAX_VALUE
+	 * @param name 名称
+	 * @param start 起始值，包含
+	 * @param reRoll 是否允许滚动
+	 * @return LongSeqPool
+	 */
+	public static LongSeqPool startFrom(String name, long start, boolean reRoll) {
+		return new LongSeqPool(name, start, Long.MAX_VALUE, reRoll);
 	}
 
 	/**
