@@ -51,9 +51,20 @@ public class SequenceAutoConfigure {
 	public Sequence<Long> sequence(SequenceProperties sequenceProperties, SeqSynchronizer seqSynchronizer) {
 		log.info("Sequence create,Using {}", seqSynchronizer.getClass().getSimpleName());
 		// 按月分区:即每个月有 Long.MAX 个序号可用
-		SeqHolder holder = new SeqHolder(seqSynchronizer, sequenceProperties.getName(), Partitions.MONTHLY,
-				sequenceProperties.getStartValue(), sequenceProperties.getFetchSize(), SeqFormatter.DEFAULT_FORMAT);
-		return holder;
+
+		// @formatter:off
+
+		return SeqHolder.builder()
+				.name(sequenceProperties.getName())
+				.synchronizer(seqSynchronizer)
+				.partitionFunc(Partitions.MONTHLY)
+				.initValue(sequenceProperties.getStartValue())
+				.poolSize(sequenceProperties.getFetchSize())
+				.seqFormatter(SeqFormatter.DEFAULT_FORMAT)
+				.build();
+
+		// @formatter:on
+
 	}
 
 	@Bean

@@ -21,6 +21,7 @@ import com.power4j.kit.seq.core.SeqFormatter;
 import com.power4j.kit.seq.core.Sequence;
 import com.power4j.kit.seq.core.exceptions.SeqException;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -72,9 +73,9 @@ public class SeqHolder implements Sequence<Long> {
 	 */
 	public SeqHolder(SeqSynchronizer seqSynchronizer, String name, Supplier<String> partitionFunc, long initValue,
 			int poolSize, SeqFormatter seqFormatter) {
-		this.seqSynchronizer = seqSynchronizer;
-		this.name = name;
-		this.partitionFunc = partitionFunc;
+		this.seqSynchronizer = Objects.requireNonNull(seqSynchronizer);
+		this.name = Objects.requireNonNull(name);
+		this.partitionFunc = Objects.requireNonNull(partitionFunc);
 		this.initValue = initValue;
 		this.poolSize = poolSize;
 		this.seqFormatter = seqFormatter == null ? SeqFormatter.DEFAULT_FORMAT : seqFormatter;
@@ -181,16 +182,16 @@ public class SeqHolder implements Sequence<Long> {
 	private LongSeqPool fetch(String partitionValue) {
 		pollCount.incrementAndGet();
 		LongSeqPool seqPool;
-		String partition = partitionValue;// computePartitionValue();
-		if (seqSynchronizer.tryCreate(name, partition, initValue + poolSize)) {
-			seqPool = LongSeqPool.forRange(makePoolName(name, partition), initValue, initValue + poolSize - 1, false);
-		}
-		else {
-			AddState state = seqSynchronizer.tryAddAndGet(name, partition, poolSize, -1);
-			seqPool = LongSeqPool.forRange(makePoolName(name, partition), state.getPrevious(), state.getCurrent() - 1,
+		if (seqSynchronizer.tryCreate(name, partitionValue, initValue + poolSize)) {
+			seqPool = LongSeqPool.forRange(makePoolName(name, partitionValue), initValue, initValue + poolSize - 1,
 					false);
 		}
-		currentPartitionValueRef.set(partition);
+		else {
+			AddState state = seqSynchronizer.tryAddAndGet(name, partitionValue, poolSize, -1);
+			seqPool = LongSeqPool.forRange(makePoolName(name, partitionValue), state.getPrevious(),
+					state.getCurrent() - 1, false);
+		}
+		currentPartitionValueRef.set(partitionValue);
 		return seqPool;
 	}
 
@@ -200,6 +201,61 @@ public class SeqHolder implements Sequence<Long> {
 
 	private String computePartitionValue() {
 		return partitionFunc.get();
+	}
+
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static class Builder {
+
+		private SeqSynchronizer synchronizer;
+
+		private String name;
+
+		private Supplier<String> partitionFunc;
+
+		private long initValue = 1;
+
+		private int poolSize = 1;
+
+		private SeqFormatter seqFormatter = ((seqName, partition, value) -> String.format("%s.%s.%08d", seqName,
+				partition, value));
+
+		public Builder synchronizer(SeqSynchronizer synchronizer) {
+			this.synchronizer = synchronizer;
+			return this;
+		}
+
+		public Builder name(String name) {
+			this.name = name;
+			return this;
+		}
+
+		public Builder partitionFunc(Supplier<String> partitionFunc) {
+			this.partitionFunc = partitionFunc;
+			return this;
+		}
+
+		public Builder initValue(long initValue) {
+			this.initValue = initValue;
+			return this;
+		}
+
+		public Builder poolSize(int poolSize) {
+			this.poolSize = poolSize;
+			return this;
+		}
+
+		public Builder seqFormatter(SeqFormatter seqFormatter) {
+			this.seqFormatter = seqFormatter;
+			return this;
+		}
+
+		public SeqHolder build() {
+			return new SeqHolder(synchronizer, name, partitionFunc, initValue, poolSize, seqFormatter);
+		}
+
 	}
 
 }

@@ -31,13 +31,14 @@ public class InMemorySequenceRegistryTest {
 	private SeqSynchronizer seqSynchronizer;
 
 	protected Sequence<Long> createSeq(String name) {
-		return new SeqHolder(seqSynchronizer, name, partitionFunc, initVal, poolSize,
-				(seqName, partition, value) -> String.format("%s.%s.%04d", seqName, partition, value));
+		return createSeq(name, partitionFunc);
 	}
 
 	protected Sequence<Long> createSeq(String name, Supplier<String> partitionFunc) {
-		return new SeqHolder(seqSynchronizer, name, partitionFunc, initVal, poolSize,
-				(seqName, partition, value) -> String.format("%s.%s.%04d", seqName, partition, value));
+		return SeqHolder.builder().name(name).synchronizer(seqSynchronizer).partitionFunc(partitionFunc)
+				.initValue(initVal).poolSize(poolSize)
+				.seqFormatter((seqName, partition, value) -> String.format("%s.%s.%04d", seqName, partition, value))
+				.build();
 	}
 
 	@Before

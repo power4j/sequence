@@ -106,7 +106,6 @@ public class LongSeqPool implements SeqPool<Long, LongSeqPool> {
 	 */
 	private LongSeqPool(String name, long start, long end, boolean reRoll) {
 		assertMinValue(start, "Invalid start value: " + start);
-		assertMaxValue(end, "Invalid end value: " + end);
 		this.name = name;
 		this.start = start;
 		this.end = end;
@@ -140,7 +139,7 @@ public class LongSeqPool implements SeqPool<Long, LongSeqPool> {
 
 	/**
 	 * 取出序号
-	 * @return
+	 * @return 返回下一个序号
 	 * @throws SeqException 号池耗尽抛出异常，可以通过 {@code hasMore} 方法提前检查
 	 * @see SeqPool#hasMore
 	 */
@@ -154,9 +153,9 @@ public class LongSeqPool implements SeqPool<Long, LongSeqPool> {
 	}
 
 	/**
-	 * 取出序号，号池耗尽返回默认值
+	 * 取出序号
 	 * @param defVal 号池耗尽时返回的默认值，必须是号池范围外的值,推荐使用 {@code OUT_OF_POOL}
-	 * @return
+	 * @return 返回下一个序号,号池耗尽返回默认值
 	 * @throws IllegalArgumentException defVal 无效
 	 * @see LongSeqPool#OUT_OF_POOL
 	 */
@@ -164,7 +163,7 @@ public class LongSeqPool implements SeqPool<Long, LongSeqPool> {
 		if (defVal >= start && defVal <= end) {
 			throw new IllegalArgumentException("Bad defVal");
 		}
-		long val = current.getAndUpdate(n -> updateFunc(n));
+		long val = current.getAndUpdate(this::updateFunc);
 		return (val > end || val < start) ? defVal : val;
 	}
 
@@ -218,12 +217,6 @@ public class LongSeqPool implements SeqPool<Long, LongSeqPool> {
 
 	protected void assertMinValue(long val, String msg) {
 		if (val < MIN_VALUE) {
-			throw new SeqException(msg);
-		}
-	}
-
-	protected void assertMaxValue(long val, String msg) {
-		if (val > MAX_VALUE) {
 			throw new SeqException(msg);
 		}
 	}

@@ -23,11 +23,23 @@ public class SeqConfig {
 
 	@Bean
 	public Sequence<Long> sequence(SequenceProperties sequenceProperties, SeqSynchronizer seqSynchronizer) {
+
+		// @formatter:off
+
 		log.info("开始自定义配置,底层实现为:{}", seqSynchronizer.getClass().getSimpleName());
 		// Partitions.MONTHLY 是分区函数,它返回分区的名称,在同一个分区中,序号自增(但不保证连续,比如服务重启,因为应用层是批量取号)
 		// MY_FORMATTER 是格式化函数,应用层可以根据 seqName, partition, value 自定义输出
-		return new SeqHolder(seqSynchronizer, sequenceProperties.getName(), Partitions.MONTHLY,
-				sequenceProperties.getStartValue(), sequenceProperties.getFetchSize(), MY_FORMATTER);
+
+		return SeqHolder.builder()
+				.name(sequenceProperties.getName())
+				.synchronizer(seqSynchronizer)
+				.partitionFunc(Partitions.MONTHLY)
+				.initValue(sequenceProperties.getStartValue())
+				.poolSize(sequenceProperties.getFetchSize())
+				.seqFormatter(MY_FORMATTER)
+				.build();
+
+		// @formatter:on
 	}
 
 }
