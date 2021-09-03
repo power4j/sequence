@@ -1,9 +1,10 @@
 package com.power4j.kit.seq.persistent.provider;
 
-import com.power4j.kit.seq.core.LongSeqPool;
 import com.power4j.kit.seq.core.exceptions.SeqException;
 import com.power4j.kit.seq.persistent.AddState;
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,8 +23,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class InMemorySeqSynchronizer implements SeqSynchronizer {
 
-	private final boolean RE_ROLL = true;
-
 	protected final AtomicLong queryCount = new AtomicLong();
 
 	protected final AtomicLong updateCount = new AtomicLong();
@@ -34,15 +33,15 @@ public class InMemorySeqSynchronizer implements SeqSynchronizer {
 
 	private final Lock wLock = rwLock.writeLock();
 
-	private final Map<String, LongSeqPool> map = new HashMap<>(8);
+	private final Map<String, Row> map = new HashMap<>(8);
 
 	@Override
 	public boolean tryCreate(String name, String partition, long nextValue) {
 		final String key = makeKey(name, partition);
-		LongSeqPool pre;
+		Row pre;
 		wLock.lock();
 		try {
-			pre = map.putIfAbsent(key, LongSeqPool.startFrom(key, 1L, RE_ROLL));
+			pre = map.putIfAbsent(key, Row.of(key, nextValue));
 		}
 		finally {
 			wLock.unlock();
@@ -55,11 +54,11 @@ public class InMemorySeqSynchronizer implements SeqSynchronizer {
 		final String key = makeKey(name, partition);
 		wLock.lock();
 		try {
-			LongSeqPool seq = map.get(key);
-			if (Objects.nonNull(seq)) {
+			Row pre = map.get(key);
+			if (Objects.nonNull(pre)) {
 				updateCount.incrementAndGet();
-				if (nextValueOld == seq.peek()) {
-					map.put(key, LongSeqPool.startFrom(key, nextValueNew, RE_ROLL));
+				if (nextValueOld == pre.getNextValue()) {
+					map.put(key, Row.of(key, nextValueNew));
 					return true;
 				}
 			}
@@ -73,16 +72,16 @@ public class InMemorySeqSynchronizer implements SeqSynchronizer {
 	@Override
 	public AddState tryAddAndGet(String name, String partition, int delta, int maxReTry) {
 		final String key = makeKey(name, partition);
-		LongSeqPool seqOld;
+		Row pre;
 		wLock.lock();
 		try {
-			seqOld = map.get(key);
-			if (Objects.nonNull(seqOld)) {
+			pre = map.get(key);
+			if (Objects.nonNull(pre)) {
 				queryCount.incrementAndGet();
-				LongSeqPool seqNew = LongSeqPool.startFrom(key, seqOld.peek() + delta, RE_ROLL);
-				map.put(key, seqNew);
+				Row row = Row.of(key, pre.getNextValue() + delta);
+				map.put(key, row);
 				updateCount.incrementAndGet();
-				return AddState.success(seqOld.peek(), seqNew.peek(), 1);
+				return AddState.success(pre.getNextValue(), row.getNextValue(), 1);
 			}
 			throw new SeqException(key + " not exists");
 		}
@@ -94,18 +93,18 @@ public class InMemorySeqSynchronizer implements SeqSynchronizer {
 	@Override
 	public Optional<Long> getNextValue(String name, String partition) {
 		final String key = makeKey(name, partition);
-		LongSeqPool seq;
+		Row row;
 		rLock.lock();
 		try {
-			seq = map.get(key);
+			row = map.get(key);
 		}
 		finally {
 			rLock.unlock();
 		}
-		if (Objects.nonNull(seq)) {
+		if (Objects.nonNull(row)) {
 			queryCount.incrementAndGet();
 		}
-		return Optional.ofNullable(seq).map(LongSeqPool::next);
+		return Optional.ofNullable(row).map(Row::getNextValue);
 	}
 
 	@Override
@@ -125,6 +124,25 @@ public class InMemorySeqSynchronizer implements SeqSynchronizer {
 
 	protected final String makeKey(String name, String partition) {
 		return name + "/" + partition;
+	}
+
+	@Getter
+	@Setter
+	static class Row {
+
+		private final String id;
+
+		private Long nextValue;
+
+		public static Row of(String id, Long nextValue) {
+			return new Row(id, nextValue);
+		}
+
+		Row(String id, Long nextValue) {
+			this.id = id;
+			this.nextValue = nextValue;
+		}
+
 	}
 
 }
