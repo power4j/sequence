@@ -57,7 +57,7 @@ public class SeqHolder implements Sequence<Long> {
 
 	private final AtomicLong pollCount = new AtomicLong();
 
-	private final AtomicReference<String> currentPartitionRef = new AtomicReference<>();
+	private final AtomicReference<String> currentPartitionValueRef = new AtomicReference<>();
 
 	private volatile LongSeqPool seqPool;
 
@@ -107,10 +107,11 @@ public class SeqHolder implements Sequence<Long> {
 
 	@Override
 	public Optional<Long> nextOpt() {
+		final String nextPartitionValue = computePartitionValue();
 		Optional<Long> val;
 		rLock.lock();
 		try {
-			if (partitionFunc.get().equals(currentPartitionRef.get())) {
+			if (nextPartitionValue.equals(currentPartitionValueRef.get())) {
 				val = (seqPool == null ? Optional.empty() : seqPool.nextOpt());
 				if (val.isPresent()) {
 					return val;
@@ -120,7 +121,7 @@ public class SeqHolder implements Sequence<Long> {
 		finally {
 			rLock.unlock();
 		}
-		return pull();
+		return pull(nextPartitionValue);
 	}
 
 	@Override
@@ -130,7 +131,7 @@ public class SeqHolder implements Sequence<Long> {
 
 	@Override
 	public Optional<String> nextStrOpt() throws SeqException {
-		return nextOpt().map(n -> seqFormatter.format(name, currentPartitionRef.get(), n));
+		return nextOpt().map(n -> seqFormatter.format(name, currentPartitionValueRef.get(), n));
 	}
 
 	/**
@@ -140,7 +141,7 @@ public class SeqHolder implements Sequence<Long> {
 		wLock.lock();
 		try {
 			if (seqPool == null) {
-				seqPool = fetch();
+				seqPool = fetch(computePartitionValue());
 			}
 		}
 		finally {
@@ -156,16 +157,16 @@ public class SeqHolder implements Sequence<Long> {
 		return pollCount.get();
 	}
 
-	private final Optional<Long> pull() {
+	private Optional<Long> pull(String partitionValue) {
 		Optional<Long> val;
 		wLock.lock();
 		try {
-			if (seqPool == null || !partitionFunc.get().equals(currentPartitionRef.get())) {
-				seqPool = fetch();
+			if (seqPool == null || !partitionValue.equals(currentPartitionValueRef.get())) {
+				seqPool = fetch(partitionValue);
 			}
 			val = seqPool.nextOpt();
 			if (!val.isPresent()) {
-				val = (seqPool = fetch()).nextOpt();
+				val = (seqPool = fetch(partitionValue)).nextOpt();
 				if (!val.isPresent()) {
 					throw new IllegalStateException("Bug detected : " + seqPool.toString());
 				}
@@ -177,10 +178,10 @@ public class SeqHolder implements Sequence<Long> {
 		}
 	}
 
-	private LongSeqPool fetch() {
+	private LongSeqPool fetch(String partitionValue) {
 		pollCount.incrementAndGet();
 		LongSeqPool seqPool;
-		String partition = partitionFunc.get();
+		String partition = partitionValue;// computePartitionValue();
 		if (seqSynchronizer.tryCreate(name, partition, initValue + poolSize)) {
 			seqPool = LongSeqPool.forRange(makePoolName(name, partition), initValue, initValue + poolSize - 1, false);
 		}
@@ -189,12 +190,16 @@ public class SeqHolder implements Sequence<Long> {
 			seqPool = LongSeqPool.forRange(makePoolName(name, partition), state.getPrevious(), state.getCurrent() - 1,
 					false);
 		}
-		currentPartitionRef.set(partition);
+		currentPartitionValueRef.set(partition);
 		return seqPool;
 	}
 
 	private String makePoolName(String seqName, String window) {
 		return seqName + "/" + window;
+	}
+
+	private String computePartitionValue() {
+		return partitionFunc.get();
 	}
 
 }
