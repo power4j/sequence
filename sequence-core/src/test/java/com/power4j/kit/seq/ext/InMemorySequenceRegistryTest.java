@@ -9,7 +9,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * @author CJ (power4j@outlook.com)
@@ -20,12 +24,19 @@ public class InMemorySequenceRegistryTest {
 
 	private final long initVal = 1L;
 
+	private final int poolSize = 100;
+
 	private final Supplier<String> partitionFunc = Partitions.DAILY;
 
 	private SeqSynchronizer seqSynchronizer;
 
 	protected Sequence<Long> createSeq(String name) {
-		return new SeqHolder(seqSynchronizer, name, partitionFunc, initVal, 100,
+		return new SeqHolder(seqSynchronizer, name, partitionFunc, initVal, poolSize,
+				(seqName, partition, value) -> String.format("%s.%s.%04d", seqName, partition, value));
+	}
+
+	protected Sequence<Long> createSeq(String name, Supplier<String> partitionFunc) {
+		return new SeqHolder(seqSynchronizer, name, partitionFunc, initVal, poolSize,
 				(seqName, partition, value) -> String.format("%s.%s.%04d", seqName, partition, value));
 	}
 
@@ -85,6 +96,41 @@ public class InMemorySequenceRegistryTest {
 			String[] parts = val.split("\\.");
 			Assert.assertEquals(2, Integer.parseInt(parts[2]));
 		}
+	}
+
+	/**
+	 * 分区计算函数按3取模,因此 ： <br/>
+	 * 取号器每一次取号，区段都和上一次不同 <br/>
+	 * 每3次又回到之前的号段,但因为重新批量取号的缘故，会出现跳号现象
+	 */
+	@Test
+	public void partitionRoundRobinTest() {
+		final int mod = 3;
+		AtomicInteger count = new AtomicInteger();
+		Supplier<String> rolling = () -> Integer.toString(count.getAndIncrement() % mod);
+		SequenceRegistry<Long, Sequence<Long>> registry = new InMemorySequenceRegistry<>();
+		String nameTemplate = "R%02d";
+
+		List<String> results = new ArrayList<>(32);
+		for (int i = 0; i < 3; i++) {
+			String name = String.format(nameTemplate, i);
+			for (int round = 0; round < 20; round++) {
+				String val = registry.getOrRegister(name, o -> createSeq(o, rolling)).nextStr();
+				results.add(val);
+				String[] parts = val.split("\\.");
+				long except = (round / mod) * poolSize + initVal;
+				Assert.assertEquals(except, Integer.parseInt(parts[2]));
+			}
+		}
+		// @formatter:off
+		results.stream()
+				.collect(Collectors.groupingBy(o -> o.substring(0, o.lastIndexOf('.'))))
+				.entrySet()
+				.stream()
+				.sorted(java.util.Map.Entry.comparingByKey())
+				.forEach(kv -> System.out.printf("%s : %s%n", kv.getKey(), String.join(" -> ", kv.getValue())));
+        // @formatter:on
+
 	}
 
 }
