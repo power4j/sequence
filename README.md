@@ -26,6 +26,7 @@
   - PostgreSQL (`9.6 +`)
   - Redis
   - MongoDB
+  - H2(MySQL兼容模式)
 
 
 ## 核心概念
