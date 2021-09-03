@@ -1,3 +1,15 @@
+## 1.5.0
+`2021-09-03`
+- 🔥 支持`H2`(GH PR #48 from lishangbu/master)
+- 🔥 新增SequenceRegistry,用于支持动态创建发号器的场景
+- 🔥 新增InMemorySeqSynchronizer,用于测试
+
+## 1.4.0
+`2020-10-08`
+- Fix duplicate key error #5
+- 一些依赖升级
+
+
 ## 1.3.0
 
 `2020-08-03`
