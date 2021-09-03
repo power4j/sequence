@@ -24,7 +24,7 @@ public class InMemorySequenceRegistry<T, S extends Sequence<T>> implements Seque
 	private final Lock wLock = rwLock.writeLock();
 
 	/**
-	 * Guard with rwLock,So we don't need ConcurrentHashMap TODO: GC
+	 * Guard with rwLock,So we don't need ConcurrentHashMap. TODO: GC
 	 */
 	private final Map<String, S> map = new HashMap<>(8);
 

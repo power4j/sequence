@@ -38,8 +38,6 @@ public class SequenceJdbcExampleApplication {
 
 	private final static int MAX_SEQ_NAME = 40;
 
-	private final static int BATCH_SIZE = 10;
-
 	private final Sequence<Long> sequence;
 
 	private final SeqSynchronizer seqSynchronizer;
@@ -65,12 +63,13 @@ public class SequenceJdbcExampleApplication {
 	}
 
 	@GetMapping("/name/{name}")
-	public List<String> getSequence(@PathVariable String name) {
+	public List<String> getSequence(@PathVariable String name, @RequestParam(required = false) Integer size) {
+		size = (size == null || size <= 0) ? 10 : size;
 		if (name.length() > MAX_SEQ_NAME) {
 			name = name.substring(0, 40);
 		}
 		List<String> data = new ArrayList<>(10);
-		for (int i = 0; i < BATCH_SIZE; ++i) {
+		for (int i = 0; i < size; ++i) {
 			data.add(seqService.getForName(name));
 		}
 		return data;
