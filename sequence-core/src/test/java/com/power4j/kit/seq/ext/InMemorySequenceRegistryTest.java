@@ -1,5 +1,6 @@
-package com.power4j.kit.seq.core;
+package com.power4j.kit.seq.ext;
 
+import com.power4j.kit.seq.core.Sequence;
 import com.power4j.kit.seq.persistent.Partitions;
 import com.power4j.kit.seq.persistent.SeqHolder;
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
@@ -42,7 +43,7 @@ public class InMemorySequenceRegistryTest {
 		Sequence<Long> a100 = registry.get(nameA100).orElse(null);
 		Assert.assertNull(a100);
 
-		a100 = registry.getOrRegister(nameA100, () -> createSeq(nameA100));
+		a100 = registry.getOrRegister(nameA100, this::createSeq);
 		Assert.assertEquals(initVal, a100.next().longValue());
 
 		registry.register(nameA200, createSeq(nameA200));
@@ -70,7 +71,7 @@ public class InMemorySequenceRegistryTest {
 		// 每个Sequence 使用一次
 		for (int i = 0; i < 10; i++) {
 			String name = String.format(nameTemplate, i);
-			String val = registry.getOrRegister(name, () -> createSeq(name)).nextStr();
+			String val = registry.getOrRegister(name, this::createSeq).nextStr();
 			System.out.println(val);
 			String[] parts = val.split("\\.");
 			Assert.assertEquals(1, Integer.parseInt(parts[2]));
@@ -79,7 +80,7 @@ public class InMemorySequenceRegistryTest {
 		// 每个Sequence 再使用一次
 		for (int i = 0; i < 10; i++) {
 			String name = String.format(nameTemplate, i);
-			String val = registry.getOrRegister(name, () -> createSeq(name)).nextStr();
+			String val = registry.getOrRegister(name, this::createSeq).nextStr();
 			System.out.println(val);
 			String[] parts = val.split("\\.");
 			Assert.assertEquals(2, Integer.parseInt(parts[2]));

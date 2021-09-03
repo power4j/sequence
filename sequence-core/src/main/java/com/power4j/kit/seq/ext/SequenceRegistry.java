@@ -1,7 +1,9 @@
-package com.power4j.kit.seq.core;
+package com.power4j.kit.seq.ext;
+
+import com.power4j.kit.seq.core.Sequence;
 
 import java.util.Optional;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 /**
  * Sequence 注册表
@@ -39,10 +41,10 @@ public interface SequenceRegistry<T, S extends Sequence<T>> {
 	/**
 	 * 返回一个已经注册的 {@code Sequence} 对象,如果不存在则将新的对象注册
 	 * @param name 名称
-	 * @param supplier 当不存在指定名称的{@code Sequence} 对象时，由该函数创建对象实例
+	 * @param func 当不存在指定名称的{@code Sequence} 对象时，由该函数创建对象实例,该函数的入参为name
 	 * @return 返回{@code Sequence} 对象
 	 */
-	S getOrRegister(String name, Supplier<S> supplier);
+	S getOrRegister(String name, Function<String, S> func);
 
 	/**
 	 * 统计数量

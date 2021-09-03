@@ -1,4 +1,6 @@
-package com.power4j.kit.seq.core;
+package com.power4j.kit.seq.ext;
+
+import com.power4j.kit.seq.core.Sequence;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,7 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 /**
  * @author CJ (power4j@outlook.com)
@@ -21,6 +23,9 @@ public class InMemorySequenceRegistry<T, S extends Sequence<T>> implements Seque
 
 	private final Lock wLock = rwLock.writeLock();
 
+	/**
+	 * Guard with rwLock,So we don't need ConcurrentHashMap TODO: GC
+	 */
 	private final Map<String, S> map = new HashMap<>(8);
 
 	@Override
@@ -58,14 +63,14 @@ public class InMemorySequenceRegistry<T, S extends Sequence<T>> implements Seque
 	}
 
 	@Override
-	public S getOrRegister(String name, Supplier<S> supplier) {
+	public S getOrRegister(String name, Function<String, S> func) {
 		S seq = get(name).orElse(null);
 		if (Objects.isNull(seq)) {
 			wLock.lock();
 			try {
 				seq = map.get(name);
 				if (Objects.isNull(seq)) {
-					seq = supplier.get();
+					seq = func.apply(name);
 					assert Objects.nonNull(seq);
 					map.put(name, seq);
 				}

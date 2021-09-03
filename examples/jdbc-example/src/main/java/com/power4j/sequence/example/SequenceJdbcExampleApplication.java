@@ -18,10 +18,11 @@ package com.power4j.sequence.example;
 
 import com.power4j.kit.seq.core.Sequence;
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,15 +31,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@RequiredArgsConstructor
 @RestController
 @SpringBootApplication
 public class SequenceJdbcExampleApplication {
 
-	@Autowired
-	private Sequence<Long> sequence;
+	private final static int MAX_SEQ_NAME = 40;
 
-	@Autowired
-	private SeqSynchronizer seqSynchronizer;
+	private final static int BATCH_SIZE = 10;
+
+	private final Sequence<Long> sequence;
+
+	private final SeqSynchronizer seqSynchronizer;
+
+	private final SeqService seqService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(SequenceJdbcExampleApplication.class, args);
@@ -55,6 +61,18 @@ public class SequenceJdbcExampleApplication {
 		data.put("query_count", Long.toString(seqSynchronizer.getQueryCounter()));
 		data.put("update_count", Long.toString(seqSynchronizer.getUpdateCounter()));
 		data.put("seq", list);
+		return data;
+	}
+
+	@GetMapping("/name/{name}")
+	public List<String> getSequence(@PathVariable String name) {
+		if (name.length() > MAX_SEQ_NAME) {
+			name = name.substring(0, 40);
+		}
+		List<String> data = new ArrayList<>(10);
+		for (int i = 0; i < BATCH_SIZE; ++i) {
+			data.add(seqService.getForName(name));
+		}
 		return data;
 	}
 

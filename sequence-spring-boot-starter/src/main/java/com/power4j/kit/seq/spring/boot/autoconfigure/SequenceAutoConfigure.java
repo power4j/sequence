@@ -18,6 +18,8 @@ package com.power4j.kit.seq.spring.boot.autoconfigure;
 
 import com.power4j.kit.seq.core.SeqFormatter;
 import com.power4j.kit.seq.core.Sequence;
+import com.power4j.kit.seq.ext.InMemorySequenceRegistry;
+import com.power4j.kit.seq.ext.SequenceRegistry;
 import com.power4j.kit.seq.persistent.Partitions;
 import com.power4j.kit.seq.persistent.SeqHolder;
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
@@ -52,6 +54,14 @@ public class SequenceAutoConfigure {
 		SeqHolder holder = new SeqHolder(seqSynchronizer, sequenceProperties.getName(), Partitions.MONTHLY,
 				sequenceProperties.getStartValue(), sequenceProperties.getFetchSize(), SeqFormatter.DEFAULT_FORMAT);
 		return holder;
+	}
+
+	@Bean
+	@ConditionalOnMissingBean(SequenceRegistry.class)
+	@ConditionalOnProperty(prefix = SequenceProperties.PREFIX, name = "enabled", havingValue = "true",
+			matchIfMissing = true)
+	public SequenceRegistry<Long, Sequence<Long>> sequenceRegistry() {
+		return new InMemorySequenceRegistry<>();
 	}
 
 }
