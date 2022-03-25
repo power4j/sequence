@@ -1,5 +1,9 @@
 name: Publish package to the Maven Central Repository
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - '*'
 
 jobs:
   oss-deploy:
@@ -13,6 +17,12 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
           cache: maven
+      - name: Cache Maven packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
 
 #      - name: Build with Maven
 #        run: mvn -B package --file pom.xml
