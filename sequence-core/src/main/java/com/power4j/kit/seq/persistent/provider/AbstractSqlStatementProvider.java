@@ -67,14 +67,18 @@ public abstract class AbstractSqlStatementProvider extends AbstractJdbcSynchroni
 	@Override
 	protected PreparedStatement getCreateTableStatement(Connection connection) throws SQLException {
 		final String sql = getCreateTableSql();
-		log.debug(sql);
+		if (log.isDebugEnabled()) {
+			log.debug("Create Table Sql:[{}]", sql);
+		}
 		return connection.prepareStatement(sql);
 	}
 
 	@Override
 	protected PreparedStatement getDropTableStatement(Connection connection) throws SQLException {
 		final String sql = getDropTableSql();
-		log.debug(sql);
+		if (log.isDebugEnabled()) {
+			log.debug("Drop Table Sql:[{}]", sql);
+		}
 		return connection.prepareStatement(sql);
 	}
 
@@ -83,7 +87,9 @@ public abstract class AbstractSqlStatementProvider extends AbstractJdbcSynchroni
 			long nextValue) throws SQLException {
 		final Timestamp now = Timestamp.valueOf(LocalDateTime.now());
 		final String sql = getCreateSeqSql();
-		log.debug(sql);
+		if (log.isDebugEnabled()) {
+			log.debug("Create Seq Sql:[{}]", sql);
+		}
 		PreparedStatement statement = connection.prepareStatement(sql);
 		statement.setString(1, name);
 		statement.setString(2, partition);
@@ -97,7 +103,9 @@ public abstract class AbstractSqlStatementProvider extends AbstractJdbcSynchroni
 	protected PreparedStatement getSelectSeqStatement(Connection connection, String name, String partition)
 			throws SQLException {
 		final String sql = getSelectSeqSql();
-		log.debug(sql);
+		if (log.isDebugEnabled()) {
+			log.debug("Select Seq Sql:[{}]", sql);
+		}
 		PreparedStatement statement = connection.prepareStatement(sql);
 		statement.setString(1, name);
 		statement.setString(2, partition);
@@ -110,7 +118,9 @@ public abstract class AbstractSqlStatementProvider extends AbstractJdbcSynchroni
 			long nextValueOld, long nextValueNew) throws SQLException {
 		final Timestamp now = Timestamp.valueOf(LocalDateTime.now());
 		final String sql = getUpdateSeqSql();
-		log.debug(sql);
+		if (log.isDebugEnabled()) {
+			log.debug("Update Seq Sql:[{}]", sql);
+		}
 		PreparedStatement statement = connection.prepareStatement(sql);
 		statement.setLong(1, nextValueNew);
 		statement.setTimestamp(2, now);

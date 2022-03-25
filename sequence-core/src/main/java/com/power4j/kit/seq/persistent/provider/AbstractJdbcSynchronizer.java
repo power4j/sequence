@@ -236,6 +236,7 @@ public abstract class AbstractJdbcSynchronizer implements SeqSynchronizer {
 				boolean updateDone = updateSeqValue(connection, name, partition, lastValue, target);
 				updateCount.incrementAndGet();
 				if (updateDone) {
+					// 需要抢占成功,返回号段的起止区间(前闭后开)
 					return AddState.success(lastValue, target, totalOps);
 				}
 			}

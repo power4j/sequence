@@ -114,7 +114,9 @@ public class PostgreSqlSynchronizer extends AbstractSqlStatementProvider impleme
 			throws SQLException {
 		final Timestamp now = Timestamp.valueOf(LocalDateTime.now());
 		final String sql = POSTGRESQL_ADD_VALUE.replace("$TABLE_NAME", tableName);
-		log.debug(sql);
+		if (log.isDebugEnabled()) {
+			log.debug("Add Value Sql:[{}]", sql);
+		}
 		try (PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setInt(1, delta);
 			statement.setTimestamp(2, now);

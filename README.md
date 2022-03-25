@@ -26,6 +26,7 @@
   - PostgreSQL (`9.6 +`)
   - Redis
   - MongoDB
+  - H2(MySQL兼容模式)
 
 
 ## 核心概念
@@ -95,6 +96,10 @@ public class SequenceExampleApplication {
 }
 ```
 
+## 自定义配置
+
+例子: [SeqConfig.java](examples/jdbc-example/src/main/java/com/power4j/sequence/example/SeqConfig.java)
+
 ## 性能测试
 
 <img src="docs/assets/img/bench.png"/>
@@ -119,12 +124,11 @@ public class SequenceExampleApplication {
 
  - [X] 支持MySQL(`1.0`)
  - [X] 支持PostgreSQL(`1.3`)
- - [ ] 支持H2(不一定会支持,因为缺乏应用场景)
+ - [X] 支持H2(`1.5`MySQL兼容模式)
  - [ ] 支持Oracle(不一定会支持,这货没有开源版本)
  - [x] 支持Redis(`1.1`)
  - [x] 支持MongoDB(`1.2`)
  - [X] Spring Boot 集成(`1.0`)
- - [ ] 优化多线程性能
 
  ## 贡献指南
 

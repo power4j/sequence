@@ -18,6 +18,8 @@ package com.power4j.kit.seq.spring.boot.autoconfigure;
 
 import com.power4j.kit.seq.core.SeqFormatter;
 import com.power4j.kit.seq.core.Sequence;
+import com.power4j.kit.seq.ext.InMemorySequenceRegistry;
+import com.power4j.kit.seq.ext.SequenceRegistry;
 import com.power4j.kit.seq.persistent.Partitions;
 import com.power4j.kit.seq.persistent.SeqHolder;
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
@@ -49,9 +51,28 @@ public class SequenceAutoConfigure {
 	public Sequence<Long> sequence(SequenceProperties sequenceProperties, SeqSynchronizer seqSynchronizer) {
 		log.info("Sequence create,Using {}", seqSynchronizer.getClass().getSimpleName());
 		// 按月分区:即每个月有 Long.MAX 个序号可用
-		SeqHolder holder = new SeqHolder(seqSynchronizer, sequenceProperties.getName(), Partitions.MONTHLY,
-				sequenceProperties.getStartValue(), sequenceProperties.getFetchSize(), SeqFormatter.DEFAULT_FORMAT);
-		return holder;
+
+		// @formatter:off
+
+		return SeqHolder.builder()
+				.name(sequenceProperties.getName())
+				.synchronizer(seqSynchronizer)
+				.partitionFunc(Partitions.MONTHLY)
+				.initValue(sequenceProperties.getStartValue())
+				.poolSize(sequenceProperties.getFetchSize())
+				.seqFormatter(SeqFormatter.DEFAULT_FORMAT)
+				.build();
+
+		// @formatter:on
+
+	}
+
+	@Bean
+	@ConditionalOnMissingBean(SequenceRegistry.class)
+	@ConditionalOnProperty(prefix = SequenceProperties.PREFIX, name = "enabled", havingValue = "true",
+			matchIfMissing = true)
+	public SequenceRegistry<Long, Sequence<Long>> sequenceRegistry() {
+		return new InMemorySequenceRegistry<>();
 	}
 
 }

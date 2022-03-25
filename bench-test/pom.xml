@@ -20,7 +20,7 @@
   <parent>
     <groupId>com.power4j.kit</groupId>
     <artifactId>sequence</artifactId>
-    <version>1.5.0-SNAPSHOT</version>
+    <version>1.5.0</version>
   </parent>
 
   <artifactId>bench-test</artifactId>
@@ -30,7 +30,7 @@
 
   <properties>
     <maven.deploy.skip>true</maven.deploy.skip>
-    <jmh.version>1.27</jmh.version>
+    <jmh.version>1.29</jmh.version>
     <!-- Name of the benchmark Uber-JAR to generate -->
     <uberjar.name>benchmarks</uberjar.name>
   </properties>
@@ -80,6 +80,10 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
     </dependency>
   </dependencies>
 

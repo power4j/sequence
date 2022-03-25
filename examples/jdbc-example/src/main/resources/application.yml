@@ -4,14 +4,16 @@ server:
 spring:
   profiles:
     # mysql, postgresql
-    active: postgresql
+    active: mysql
 
 power4j:
   sequence:
     fetch-size: 10
 ---
 spring:
-  profiles: mysql
+  config:
+    activate:
+      on-profile: mysql
   datasource:
     url: "jdbc:mysql://${MYSQL_HOST:localhost}:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false"
     username: root
@@ -23,7 +25,9 @@ power4j:
     backend: mysql
 ---
 spring:
-  profiles: postgresql
+  config:
+    activate:
+      on-profile: postgresql
   datasource:
     url: "jdbc:postgresql://${POSTGRESQL_HOST:localhost}:5432/test?ssl=false"
     username: root
