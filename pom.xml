@@ -20,7 +20,7 @@
 
   <groupId>com.power4j.kit</groupId>
   <artifactId>sequence</artifactId>
-  <version>1.5.0</version>
+  <version>1.5.1-SNAPSHOT</version>
   <name>${project.artifactId}</name>
   <packaging>pom</packaging>
 

@@ -25,7 +25,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 
@@ -39,10 +38,6 @@ import java.util.function.Supplier;
 public class SeqHolder implements Sequence<Long> {
 
 	private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
-
-	private final Lock rLock = rwLock.readLock();
-
-	private final Lock wLock = rwLock.writeLock();
 
 	private final SeqSynchronizer seqSynchronizer;
 
@@ -97,12 +92,12 @@ public class SeqHolder implements Sequence<Long> {
 
 	@Override
 	public String getName() {
-		rLock.lock();
+		rwLock.readLock().lock();
 		try {
 			return seqPool == null ? name : seqPool.getName();
 		}
 		finally {
-			rLock.unlock();
+			rwLock.readLock().unlock();
 		}
 	}
 
@@ -110,7 +105,7 @@ public class SeqHolder implements Sequence<Long> {
 	public Optional<Long> nextOpt() {
 		final String nextPartitionValue = computePartitionValue();
 		Optional<Long> val;
-		rLock.lock();
+		rwLock.readLock().lock();
 		try {
 			if (nextPartitionValue.equals(currentPartitionValueRef.get())) {
 				val = (seqPool == null ? Optional.empty() : seqPool.nextOpt());
@@ -120,7 +115,7 @@ public class SeqHolder implements Sequence<Long> {
 			}
 		}
 		finally {
-			rLock.unlock();
+			rwLock.readLock().unlock();
 		}
 		return pull(nextPartitionValue);
 	}
@@ -139,14 +134,14 @@ public class SeqHolder implements Sequence<Long> {
 	 * 默认的初始化是懒加载,执行此方法可以手动初始化
 	 */
 	public void prepare() {
-		wLock.lock();
+		rwLock.writeLock().lock();
 		try {
 			if (seqPool == null) {
 				seqPool = fetch(computePartitionValue());
 			}
 		}
 		finally {
-			wLock.unlock();
+			rwLock.writeLock().unlock();
 		}
 	}
 
@@ -160,7 +155,7 @@ public class SeqHolder implements Sequence<Long> {
 
 	private Optional<Long> pull(String partitionValue) {
 		Optional<Long> val;
-		wLock.lock();
+		rwLock.writeLock().lock();
 		try {
 			if (seqPool == null || !partitionValue.equals(currentPartitionValueRef.get())) {
 				seqPool = fetch(partitionValue);
@@ -175,7 +170,7 @@ public class SeqHolder implements Sequence<Long> {
 			return val;
 		}
 		finally {
-			wLock.unlock();
+			rwLock.writeLock().unlock();
 		}
 	}
 
