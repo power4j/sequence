@@ -19,13 +19,12 @@ package com.power4j.kit.seq.spring.boot.autoconfigure;
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
 import com.power4j.kit.seq.persistent.provider.MySqlSynchronizer;
 import com.power4j.kit.seq.persistent.provider.PostgreSqlSynchronizer;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import javax.sql.DataSource;
 
@@ -36,8 +35,7 @@ import javax.sql.DataSource;
  * @date 2020/7/7
  * @since 1.0
  */
-@Configuration
-@AutoConfigureAfter(DataSourceAutoConfiguration.class)
+@AutoConfiguration(after = DataSourceAutoConfiguration.class)
 public class JdbcSynchronizerConfigure {
 
 	@Bean

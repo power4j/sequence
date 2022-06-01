@@ -24,11 +24,11 @@ import com.power4j.kit.seq.persistent.Partitions;
 import com.power4j.kit.seq.persistent.SeqHolder;
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 /**
@@ -39,7 +39,7 @@ import org.springframework.context.annotation.Import;
  * @since 1.0
  */
 @Slf4j
-@Configuration
+@AutoConfiguration
 @EnableConfigurationProperties(SequenceProperties.class)
 @Import({ JdbcSynchronizerConfigure.class, RedisSynchronizerConfigure.class })
 public class SequenceAutoConfigure {

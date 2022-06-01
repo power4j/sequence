@@ -1,6 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.power4j.kit.seq.spring.boot.autoconfigure.JdbcSynchronizerConfigure,\
-  com.power4j.kit.seq.spring.boot.autoconfigure.RedisSynchronizerConfigure,\
-  com.power4j.kit.seq.spring.boot.autoconfigure.MongoSynchronizerConfigure,\
-  com.power4j.kit.seq.spring.boot.autoconfigure.SequenceAutoConfigure,\
-  com.power4j.kit.seq.spring.boot.autoconfigure.actuator.EndpointAutoConfiguration

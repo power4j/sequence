@@ -20,19 +20,19 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.power4j.kit.seq.persistent.SeqSynchronizer;
 import com.power4j.kit.seq.persistent.provider.SimpleMongoSynchronizer;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * @author CJ (power4j@outlook.com)
  * @date 2020/7/20
  * @since 1.0
  */
-@Configuration
+@AutoConfiguration
 @ConditionalOnClass(MongoClient.class)
 public class MongoSynchronizerConfigure {
 
