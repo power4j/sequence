@@ -1,7 +1,9 @@
-name: Publish package to the Maven Central Repository
+name: Publish to the Maven Central
 on:
   workflow_dispatch:
   push:
+    branches:
+      - snapshot
     tags:
       - '*'
 
@@ -23,28 +25,13 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-
-#      - name: Build with Maven
-#        run: mvn -B package --file pom.xml
-
-#      - name: Publish to GitHub Packages Apache Maven
-#        run: mvn deploy
-#        env:
-#          GITHUB_TOKEN: ${{ github.token }} # GITHUB_TOKEN is the default env for the password
-
-      - name: Setup Maven Central
-        uses: actions/setup-java@v3
-        with: # overwrite settings.xml
-          java-version: '11'
-          distribution: 'adopt'
-          server-id: ossrh
-          server-username: OSSRH_USERNAME
-          server-password: OSSRH_PASSWORD
-          gpg-private-key: ${{ secrets.MAVEN_GPG_KEY }}
-          gpg-passphrase: MAVEN_GPG_PASSPHRASE
-
+      - name: Import GPG
+        uses: crazy-max/ghaction-import-gpg@v4.4.0
+        with:
+          gpg_private_key: ${{ secrets.MAVEN_GPG_KEY }}
+          passphrase: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
       - name: Publish to Maven Central
-        run: mvn clean deploy -DskipTests=true -P 'oss-release'
+        run: ./mvnw --settings ./ossrh-settings.xml clean deploy -Dgpg.passphrase=${MAVEN_GPG_PASSPHRASE} -DskipTests=true -P 'oss-release'
         env:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
