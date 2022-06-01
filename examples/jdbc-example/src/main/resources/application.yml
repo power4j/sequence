@@ -3,8 +3,8 @@ server:
 
 spring:
   profiles:
-    # mysql, postgresql
-    active: mysql
+    # mysql, postgresql, h2
+    active: h2
 
 power4j:
   sequence:
@@ -37,3 +37,18 @@ power4j:
   sequence:
     # 数据同步使用的后端支持(如: mysql,oracle,redis)
     backend: postgresql
+---
+spring:
+  config:
+    activate:
+      on-profile: h2
+  datasource:
+    url: jdbc:h2:mem:test-db;MODE=MYSQL
+    username: sa
+    password: password
+    driverClassName: org.h2.Driver
+
+power4j:
+  sequence:
+    # 数据同步使用的后端支持(如: mysql,oracle,redis)
+    backend: mysql
