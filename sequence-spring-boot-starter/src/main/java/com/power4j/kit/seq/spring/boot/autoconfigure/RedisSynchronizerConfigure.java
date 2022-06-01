@@ -22,19 +22,19 @@ import com.power4j.kit.seq.persistent.provider.SimpleLettuceSynchronizer;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
 import io.lettuce.core.cluster.RedisClusterClient;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * @author CJ (power4j@outlook.com)
  * @date 2020/7/13
  * @since 1.0
  */
-@Configuration
+@AutoConfiguration
 @ConditionalOnClass({ RedisClient.class, RedisClusterClient.class })
 public class RedisSynchronizerConfigure {
 

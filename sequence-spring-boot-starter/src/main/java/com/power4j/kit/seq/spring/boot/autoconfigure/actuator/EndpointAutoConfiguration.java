@@ -18,10 +18,10 @@ package com.power4j.kit.seq.spring.boot.autoconfigure.actuator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * 监控端点自动配置
@@ -30,7 +30,7 @@ import org.springframework.context.annotation.Configuration;
  * @date 2020/9/26
  * @since 1.4
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 public class EndpointAutoConfiguration {
 
 	@Autowired
