@@ -62,7 +62,7 @@
     <maven.compiler.target>11</maven.compiler.target>
     <spring-javaformat.plugin.version>0.0.33</spring-javaformat.plugin.version>
     <git.commit.plugin.version>4.0.5</git.commit.plugin.version>
-    <spring-boot.version>2.4.5</spring-boot.version>
+    <spring-boot.version>2.6.8</spring-boot.version>
   </properties>
 
   <dependencies>
