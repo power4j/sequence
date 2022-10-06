@@ -60,7 +60,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
-    <spring-javaformat.plugin.version>0.0.34</spring-javaformat.plugin.version>
+    <spring-javaformat.plugin.version>0.0.35</spring-javaformat.plugin.version>
     <git.commit.plugin.version>4.9.10</git.commit.plugin.version>
     <spring-boot.version>2.7.4</spring-boot.version>
   </properties>
