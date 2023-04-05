@@ -13,7 +13,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Set up JDK 11
@@ -22,7 +22,7 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
       - name: Cache Maven packages
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
@@ -30,7 +30,7 @@ jobs:
       - name: Build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-        run: mvn -B package -DskipTests=true --file pom.xml
+        run: mvn -B package -DskipTests=true --file pom.xml -U
 # todo setup test service https://stackoverflow.com/questions/65914287/github-action-with-mysql-test-database
 #      - name: Test with Maven
 #        run: mvn -B test -DskipTests=false
