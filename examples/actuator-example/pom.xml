@@ -25,10 +25,6 @@
   <artifactId>actuator-example</artifactId>
   <name>actuator-example</name>
 
-  <properties>
-    <java.version>1.8</java.version>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>com.power4j.kit</groupId>

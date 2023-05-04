@@ -27,10 +27,6 @@
 
   <description>Sequence example with JDBC backend</description>
 
-  <properties>
-    <java.version>11</java.version>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>com.power4j.kit</groupId>
