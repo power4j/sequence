@@ -12,6 +12,53 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      mongo:
+        image: mongo
+        env:
+          MONGO_INITDB_ROOT_USERNAME: test
+          MONGO_INITDB_ROOT_PASSWORD: test
+          MONGO_INITDB_DATABASE: test
+        ports:
+          - 27017:27017
+        options:  >-
+          --health-cmd "echo 'db.runCommand("ping").ok' | mongosh --quiet"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: 'root'
+          MYSQL_DATABASE: 'test'
+          MYSQL_USER: 'test'
+          MYSQL_PASSWORD: 'test'
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+      postgres:
+        image: postgres:9.6
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v3
         with:
@@ -33,7 +80,16 @@ jobs:
       - name: Build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-        run: mvn -B package -DskipTests=true --file pom.xml -U
+          MAVEN_OPTS: "-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+          TEST_MYSQL_URL: "jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true"
+          TEST_MYSQL_USER: test
+          TEST_MYSQL_PWD: test
+          TEST_POSTGRESQL_URL: "jdbc:postgresql://localhost:5432/test?ssl=false"
+          TEST_POSTGRESQL_USER: test
+          TEST_POSTGRESQL_PWD: test
+          TEST_REDIS_URI: "redis://localhost:6379"
+          TEST_MONGO_URI: "mongodb://test:test@localhost:27017"
+        run: mvn -B package -DskipTests=false --file pom.xml -U
 # todo setup test service https://stackoverflow.com/questions/65914287/github-action-with-mysql-test-database
 #      - name: Test with Maven
 #        run: mvn -B test -DskipTests=false
