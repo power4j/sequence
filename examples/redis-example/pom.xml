@@ -20,7 +20,7 @@
   <parent>
     <groupId>com.power4j.kit</groupId>
     <artifactId>sequence-examples</artifactId>
-    <version>2.0.1-SNAPSHOT</version>
+    <version>2.0.1</version>
   </parent>
   <artifactId>redis-example</artifactId>
   <name>redis-example</name>

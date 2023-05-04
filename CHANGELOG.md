@@ -1,7 +1,13 @@
+## 2.0.1
+`2023-05-04`
+- 🔥 升级Spring Boot `3.x`
+- 🔥 使用Java 17
+
 ## 1.6.0
 `2022-06-01`
 - 🔥 升级Spring Boot `2.7.0`,使用Spring Boot 2.7新的配置文件加载方式(GH PR #79 from lishangbu/master)
 
+mvn versions:set -DnewVersion=
 ## 1.5.1
 `2022-06-01`
 - 🔥 升级到Java 11
@@ -57,4 +63,3 @@
 
 - 🔥 支持`MySQL`
 - 🔥Spring Boot 集成
-
