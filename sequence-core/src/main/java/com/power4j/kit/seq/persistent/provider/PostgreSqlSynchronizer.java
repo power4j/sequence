@@ -93,7 +93,7 @@ public class PostgreSqlSynchronizer extends AbstractSqlStatementProvider impleme
 	public AddState tryAddAndGet(String name, String partition, int delta, int maxReTry) {
 		try (Connection connection = getConnection()) {
 			return addAndGet(connection, name, partition, delta).map(val -> AddState.success(val - delta, val, 1))
-					.orElseThrow(() -> new SeqException(String.format("Not exist: %s %s", name, partition)));
+				.orElseThrow(() -> new SeqException(String.format("Not exist: %s %s", name, partition)));
 		}
 		catch (SQLException e) {
 			log.warn(e.getMessage(), e);

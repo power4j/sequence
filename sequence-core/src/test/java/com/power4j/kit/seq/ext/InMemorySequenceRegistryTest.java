@@ -35,10 +35,14 @@ public class InMemorySequenceRegistryTest {
 	}
 
 	protected Sequence<Long> createSeq(String name, Supplier<String> partitionFunc) {
-		return SeqHolder.builder().name(name).synchronizer(seqSynchronizer).partitionFunc(partitionFunc)
-				.initValue(initVal).poolSize(poolSize)
-				.seqFormatter((seqName, partition, value) -> String.format("%s.%s.%04d", seqName, partition, value))
-				.build();
+		return SeqHolder.builder()
+			.name(name)
+			.synchronizer(seqSynchronizer)
+			.partitionFunc(partitionFunc)
+			.initValue(initVal)
+			.poolSize(poolSize)
+			.seqFormatter((seqName, partition, value) -> String.format("%s.%s.%04d", seqName, partition, value))
+			.build();
 	}
 
 	@Before

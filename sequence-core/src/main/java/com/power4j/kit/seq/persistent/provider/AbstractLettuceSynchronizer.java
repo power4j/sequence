@@ -75,7 +75,7 @@ public abstract class AbstractLettuceSynchronizer implements SeqSynchronizer {
 	protected boolean doUpdate(RedisScriptingCommands<String, String> redisCommands, String name, String partition,
 			long nextValueOld, long nextValueNew) {
 		String scriptId = serverScript
-				.updateAndGet((s -> s != null ? s : loadScript(redisCommands, RedisConstants.UPDATE_SCRIPT)));
+			.updateAndGet((s -> s != null ? s : loadScript(redisCommands, RedisConstants.UPDATE_SCRIPT)));
 		String[] keys = { makeKey(name, partition) };
 		boolean ret = redisCommands.evalsha(scriptId, ScriptOutputType.BOOLEAN, keys, Long.toString(nextValueOld),
 				Long.toString(nextValueNew));

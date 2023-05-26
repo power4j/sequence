@@ -201,11 +201,12 @@ public class LongSeqPoolTest {
 		// 每个线程执行了 N 次 next
 		Assert.assertEquals(all.size(), threads * size);
 		all.sort(Long::compareTo);
-		List<List<Long>> bad = splitCollection(all, threads).stream().filter(list -> list.size() != threads)
-				.collect(Collectors.toList());
+		List<List<Long>> bad = splitCollection(all, threads).stream()
+			.filter(list -> list.size() != threads)
+			.collect(Collectors.toList());
 
 		bad.forEach(list -> System.out
-				.println("发现异常数据: " + list.stream().map(v -> v.toString()).collect(Collectors.joining(", "))));
+			.println("发现异常数据: " + list.stream().map(v -> v.toString()).collect(Collectors.joining(", "))));
 		Assert.assertEquals(bad.size(), 0);
 	}
 
