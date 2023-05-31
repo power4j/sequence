@@ -25,6 +25,11 @@
   <artifactId>actuator-example</artifactId>
   <name>actuator-example</name>
 
+  <properties>
+    <maven.install.skip>true</maven.install.skip>
+    <maven.deploy.skip>true</maven.deploy.skip>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>com.power4j.kit</groupId>
