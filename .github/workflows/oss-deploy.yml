@@ -28,7 +28,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Import GPG
-        uses: crazy-max/ghaction-import-gpg@v4.4.0
+        uses: crazy-max/ghaction-import-gpg@v5
         with:
           gpg_private_key: ${{ secrets.MAVEN_GPG_KEY }}
           passphrase: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
