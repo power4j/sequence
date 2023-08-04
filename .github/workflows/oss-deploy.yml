@@ -33,8 +33,13 @@ jobs:
           gpg_private_key: ${{ secrets.MAVEN_GPG_KEY }}
           passphrase: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
 
+      - name: List GPG Keys
+        run: gpg -K
+
       - name: Publish to Maven Central
-        run: ./mvnw --settings ./ossrh-settings.xml clean deploy -Dgpg.passphrase=${MAVEN_GPG_PASSPHRASE} -DskipTests=true -P 'oss-release'
+        run: |
+          ./mvnw -v
+          ./mvnw --settings ./ossrh-settings.xml clean deploy -Dgpg.passphrase=${MAVEN_GPG_PASSPHRASE} -DskipTests=true -P 'oss-release'
         env:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
