@@ -20,7 +20,7 @@
   <parent>
     <groupId>com.power4j.kit</groupId>
     <artifactId>sequence</artifactId>
-    <version>2.0.2-SNAPSHOT</version>
+    <version>${revision}</version>
   </parent>
 
   <artifactId>sequence-examples</artifactId>

@@ -20,7 +20,7 @@
   <parent>
     <groupId>com.power4j.kit</groupId>
     <artifactId>sequence</artifactId>
-    <version>2.0.2-SNAPSHOT</version>
+    <version>${revision}</version>
   </parent>
 
   <artifactId>sequence-core</artifactId>
@@ -79,6 +79,31 @@
         <configuration>
           <skip>false</skip>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>flatten-maven-plugin</artifactId>
+        <inherited>true</inherited>
+        <executions>
+          <execution>
+            <!-- Tidy up all POMs before they are published -->
+            <id>flatten</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>flatten</goal>
+            </goals>
+            <configuration>
+              <updatePomFile>true</updatePomFile>
+              <flattenMode>oss</flattenMode>
+              <embedBuildProfileDependencies>true</embedBuildProfileDependencies>
+              <pomElements>
+                <parent>expand</parent>
+                <distributionManagement>remove</distributionManagement>
+                <repositories>remove</repositories>
+              </pomElements>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
