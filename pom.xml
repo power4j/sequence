@@ -55,7 +55,7 @@
   </developers>
 
   <properties>
-    <revision>2.0.4</revision>
+    <revision>2.x-SNAPSHOT</revision>
     <skipTests>true</skipTests>
     <java.version>17</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
