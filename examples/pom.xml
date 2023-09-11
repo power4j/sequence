@@ -24,6 +24,7 @@
   </parent>
 
   <artifactId>sequence-examples</artifactId>
+  <name>${parent.artifactId}</name>
   <packaging>pom</packaging>
 
   <properties>
