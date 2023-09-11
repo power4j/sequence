@@ -24,6 +24,7 @@
   </parent>
 
   <artifactId>bench-test</artifactId>
+  <name>${parent.artifactId}</name>
 
   <url>https://github.com/power4j/sequence</url>
   <description>performance test</description>
