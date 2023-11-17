@@ -62,7 +62,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
-    <spring-javaformat.plugin.version>0.0.39</spring-javaformat.plugin.version>
+    <spring-javaformat.plugin.version>0.0.40</spring-javaformat.plugin.version>
     <git.commit.plugin.version>4.9.10</git.commit.plugin.version>
     <flatten-maven-plugin.version>1.5.0</flatten-maven-plugin.version>
     <spring-boot.version>3.1.5</spring-boot.version>
