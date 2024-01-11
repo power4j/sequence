@@ -45,8 +45,7 @@ public class SequenceRedisExampleApplication {
 	}
 
 	@GetMapping("/")
-	public Map<String, Object> getSequence(@RequestParam(required = false) Integer size) {
-		size = (size == null || size <= 0) ? 10 : size;
+	public Map<String, Object> getSequence(@RequestParam(name = "size", defaultValue = "10") Integer size) {
 		List<String> list = new ArrayList<>(size);
 		for (int i = 0; i < size; ++i) {
 			list.add(sequence.nextStr());
